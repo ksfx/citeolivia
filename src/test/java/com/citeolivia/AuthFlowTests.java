@@ -7,6 +7,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -202,5 +203,25 @@ class AuthFlowTests {
                 .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("<html"))));
         mvc.perform(get("/register/email-check").param("email", "free@example.com"))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("noch frei")));
+    }
+
+    @Test
+    void marketingVideoIsPublicAndSeekable() throws Exception {
+        mvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("/video/citeolivia-marketing.mp4")))
+                .andExpect(
+                        content().string(org.hamcrest.Matchers.containsString("/video/citeolivia-marketing.de.vtt")));
+        mvc.perform(get("/video/citeolivia-marketing-poster.jpg")).andExpect(status().isOk());
+        mvc.perform(get("/video/citeolivia-marketing.de.vtt"))
+                .andExpect(status().isOk())
+                // Content-Type text/vtt is set by Tomcat (server.mime-mappings), not visible in MockMvc
+                .andExpect(content().string(org.hamcrest.Matchers.startsWith("WEBVTT")));
+        // byte ranges are required for seeking in the browser player
+        mvc.perform(get("/video/citeolivia-marketing.mp4").header("Range", "bytes=0-1023"))
+                .andExpect(status().isPartialContent())
+                .andExpect(header().string("Content-Type", "video/mp4"))
+                .andExpect(header().string("Content-Length", "1024"))
+                .andExpect(header().string("Cache-Control", org.hamcrest.Matchers.containsString("max-age=2592000")));
     }
 }

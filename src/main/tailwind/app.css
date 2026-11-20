@@ -151,3 +151,12 @@
   h1, h2 { font-weight: 700; }
   h3 { font-weight: 600; }
 }
+
+/* Video subtitles in the CI (Inter on Ink) */
+video::cue {
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.95em;
+  line-height: 1.35;
+  color: #FFFFFF;
+  background-color: rgba(28, 24, 48, 0.85);
+}

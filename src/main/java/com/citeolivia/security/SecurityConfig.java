@@ -106,6 +106,7 @@ class SecurityConfig {
                                 "/js/**",
                                 "/fonts/**",
                                 "/brand/**",
+                                "/video/**",
                                 "/favicon.ico",
                                 "/site.webmanifest",
                                 "/error")

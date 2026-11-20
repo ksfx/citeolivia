@@ -21,11 +21,52 @@
                 <a sec:authorize="isAuthenticated()" class="btn btn-primary btn-lg" th:href="@{/dashboard}">Zur Bibliothek</a>
             </div>
         </div>
-        <div class="flex justify-center">
-            <div class="rounded-box bg-accent p-12 lg:p-16">
-                <img th:src="@{/brand/bildmarke-farbig.svg}" alt="" class="w-40 lg:w-56 h-auto dark:hidden">
-                <img th:src="@{/brand/bildmarke-weiss.svg}" alt="" class="w-40 lg:w-56 h-auto hidden dark:block">
-            </div>
+        <!-- Video teaser: jumps to the product video below -->
+        <a href="#video" class="group relative hidden lg:block w-full max-w-xl mx-auto" aria-label="Produktvideo ansehen (3 Minuten)">
+            <span class="absolute -inset-5 rounded-[2.5rem] bg-gradient-to-br from-primary/35 via-accent to-primary/15 blur-2xl opacity-80 dark:opacity-50 transition-opacity group-hover:opacity-100"
+                  aria-hidden="true"></span>
+            <img th:src="@{/video/citeolivia-marketing-poster.jpg}" alt="Vorschau des Produktvideos"
+                 class="relative w-full aspect-video object-cover rounded-box border border-base-300 ring-1 ring-primary/10 transition-transform duration-300 group-hover:scale-[1.02]">
+            <span class="relative mt-4 flex items-center justify-center gap-2 text-sm font-semibold text-primary">
+                ▶ CiteOlivia in 3 Minuten ansehen
+            </span>
+        </a>
+    </section>
+
+    <!-- Product video (Wiki: Marketingvideo). No custom JS: native controls, poster with play button. -->
+    <section id="video" class="mt-20 lg:mt-28 scroll-mt-8">
+        <div class="text-center max-w-2xl mx-auto mb-10">
+            <span class="badge badge-accent">Video · 3 Minuten</span>
+            <h2 class="text-3xl lg:text-4xl mt-3">So arbeitest du mit <span class="text-primary">CiteOlivia</span></h2>
+            <p class="mt-3 text-lg text-base-content/75">Von der ersten Quelle über Zitate und Gliederung bis zum fertigen Literaturverzeichnis in Word.</p>
+        </div>
+        <div class="relative max-w-5xl mx-auto">
+            <div class="absolute -inset-6 lg:-inset-10 rounded-[3rem] bg-gradient-to-br from-primary/35 via-accent to-primary/15 blur-3xl opacity-80 dark:opacity-50"
+                 aria-hidden="true"></div>
+            <figure class="relative rounded-box overflow-hidden border border-base-300 bg-base-100 ring-1 ring-primary/10">
+                <div class="flex items-center gap-3 px-4 py-2.5 bg-base-200 border-b border-base-300" aria-hidden="true">
+                    <span class="flex gap-1.5">
+                        <span class="size-3 rounded-full bg-base-300"></span>
+                        <span class="size-3 rounded-full bg-base-300"></span>
+                        <span class="size-3 rounded-full bg-base-300"></span>
+                    </span>
+                    <span class="flex-1 flex justify-center">
+                        <span class="inline-flex items-center gap-2 rounded-field bg-base-100 border border-base-300 px-3 py-0.5 text-xs text-base-content/60">
+                            <img th:src="@{/brand/favicon.svg}" alt="" class="size-3.5">citeolivia.com
+                        </span>
+                    </span>
+                    <span class="w-12"></span>
+                </div>
+                <video class="block w-full aspect-video bg-neutral" controls preload="none" playsinline
+                       th:poster="@{/video/citeolivia-marketing-poster.jpg}"
+                       aria-label="Produktvideo: So arbeitest du mit CiteOlivia (3 Minuten 14 Sekunden)">
+                    <source th:src="@{/video/citeolivia-marketing.mp4}" type="video/mp4">
+                    <track kind="captions" srclang="de" label="Deutsch" th:src="@{/video/citeolivia-marketing.de.vtt}">
+                    <p class="p-6">Dein Browser kann das Video nicht abspielen.
+                        <a class="link link-primary" th:href="@{/video/citeolivia-marketing.mp4}">Video herunterladen (MP4, 12 MB)</a></p>
+                </video>
+            </figure>
+            <p class="relative mt-4 text-center text-sm text-base-content/60">Mit deutschen Untertiteln (im Player einschaltbar) · 3:14 Min.</p>
         </div>
     </section>
 
