@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/layout :: layout(null, ~{::main})}">
+<body>
+<main class="flex-1 w-full max-w-6xl mx-auto px-4 lg:px-8 py-12 lg:py-20">
+    <section class="grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+            <span class="badge badge-accent mb-4">Literatur- und Referenzverwaltung</span>
+            <h1 class="text-4xl lg:text-6xl leading-tight">
+                Große Gedanken.<br><span class="text-primary">Sauber belegt.</span>
+            </h1>
+            <p class="mt-6 text-lg text-base-content/80 max-w-prose">
+                CiteOlivia hilft dir, Quellen zu sammeln, Zitate und Gedanken zu ordnen
+                und deine Arbeit korrekt zu belegen – alles an einem Ort.
+            </p>
+            <div class="mt-8 flex flex-wrap gap-3">
+                <th:block sec:authorize="isAnonymous()">
+                    <a class="btn btn-primary btn-lg" th:href="@{/register}">Jetzt starten</a>
+                    <a class="btn btn-ghost btn-lg" th:href="@{/login}">Ich habe schon ein Konto</a>
+                </th:block>
+                <a sec:authorize="isAuthenticated()" class="btn btn-primary btn-lg" th:href="@{/dashboard}">Zur Bibliothek</a>
+            </div>
+        </div>
+        <div class="flex justify-center">
+            <div class="rounded-box bg-accent p-12 lg:p-16">
+                <img th:src="@{/brand/bildmarke-farbig.svg}" alt="" class="w-40 lg:w-56 h-auto dark:hidden">
+                <img th:src="@{/brand/bildmarke-weiss.svg}" alt="" class="w-40 lg:w-56 h-auto hidden dark:block">
+            </div>
+        </div>
+    </section>
+
+    <section class="mt-20 grid md:grid-cols-3 gap-6">
+        <div class="card bg-base-100 border border-base-300">
+            <div class="card-body">
+                <h3 class="card-title">Quellen sammeln</h3>
+                <p class="text-base-content/75">Bücher, Artikel und Webseiten in einer Bibliothek erfassen und wiederfinden.</p>
+            </div>
+        </div>
+        <div class="card bg-base-100 border border-base-300">
+            <div class="card-body">
+                <h3 class="card-title">Wissen ordnen</h3>
+                <p class="text-base-content/75">Zitate, Notizen und Gedanken direkt an der Quelle festhalten.</p>
+            </div>
+        </div>
+        <div class="card bg-base-100 border border-base-300">
+            <div class="card-body">
+                <h3 class="card-title">Sauber zitieren</h3>
+                <p class="text-base-content/75">Literaturverzeichnisse im passenden Zitierstil erzeugen.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="mt-6 rounded-box bg-accent p-8 lg:p-10 grid md:grid-cols-[auto_1fr_auto] gap-6 items-center">
+        <img th:src="@{/word/icon-80.png}" alt="" width="64" height="64" class="w-16 h-16">
+        <div>
+            <span class="badge badge-primary badge-sm mb-2">Neu</span>
+            <h2 class="text-2xl">CiteOlivia für Word</h2>
+            <p class="mt-1 text-base-content/80 max-w-prose">Zitate mit Seitenangabe und das Literaturverzeichnis direkt beim Schreiben einfügen,
+                in Word für Windows, Mac und im Browser.</p>
+        </div>
+        <a class="btn btn-primary" th:href="@{/word-add-in}">So installierst du das Add-in</a>
+    </section>
+</main>
+</body>
+</html>

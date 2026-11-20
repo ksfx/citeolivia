@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Anmelden', ~{::main})}">
+<body>
+<main class="flex-1 flex justify-center items-start px-4 py-12">
+    <div class="card w-full max-w-md bg-base-100 border border-base-300">
+        <form class="card-body" th:action="@{/login}" method="post">
+            <div th:replace="~{fragments/auth-card :: brand('Willkommen zurück')}"></div>
+            <div th:if="${param.registered}" role="alert" class="alert alert-success">Registrierung erfolgreich – bitte anmelden.</div>
+            <div th:if="${param.error}" role="alert" class="alert alert-error">E-Mail oder Passwort falsch.</div>
+            <div th:if="${param.logout}" role="alert" class="alert alert-info">Du wurdest abgemeldet.</div>
+            <label class="floating-label">
+                <span>E-Mail</span>
+                <input class="input w-full" type="email" name="email" placeholder="E-Mail" autocomplete="username" required autofocus>
+            </label>
+            <label class="floating-label">
+                <span>Passwort</span>
+                <input class="input w-full" type="password" name="password" placeholder="Passwort" autocomplete="current-password" required>
+            </label>
+            <button type="submit" class="btn btn-primary mt-2">Anmelden</button>
+            <p class="text-sm">Noch kein Konto? <a class="link link-primary" th:href="@{/register}">Registrieren</a></p>
+        </form>
+    </div>
+</main>
+</body>
+</html>

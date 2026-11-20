@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(${project.name}, ~{::main})}">
+<body>
+<main class="flex-1 w-full max-w-6xl mx-auto px-4 lg:px-8 py-8">
+    <div th:replace="~{fragments/project :: projectHeader('references')}"></div>
+
+    <div class="flex flex-wrap gap-2 items-start mb-4">
+        <form class="flex flex-wrap gap-2 flex-1" role="search" method="get"
+              th:action="@{/projects/{id}/references(id=${project.id})}"
+              th:hx-get="@{/projects/{id}/references(id=${project.id})}"
+              hx-target="#results" hx-swap="outerHTML" hx-trigger="input delay:300ms, change, submit" hx-push-url="true">
+            <label class="input flex-1 min-w-60">
+                <span class="sr-only">Suchen</span>
+                <input type="search" name="q" th:value="${q}" placeholder="Suchen: Titel, Person, Schlagwort, Jahr …">
+            </label>
+            <select name="type" class="select w-auto" aria-label="Dokumenttyp">
+                <option value="">Alle Dokumenttypen</option>
+                <option th:each="t : ${referenceTypes}" th:value="${t}" th:text="${t.label}" th:selected="${t == type}">Buch</option>
+            </select>
+            <select name="category" class="select w-auto" aria-label="Kategorie" th:if="${!#lists.isEmpty(outline)}">
+                <option value="">Alle Kategorien</option>
+                <option th:each="c : ${outline}" th:value="${c.id}" th:text="${c.label()}" th:selected="${c.id == category}">1 Einleitung</option>
+            </select>
+        </form>
+        <a class="btn btn-primary" th:href="@{/projects/{id}/references/new(id=${project.id})}">+ Titel hinzufügen</a>
+    </div>
+
+    <div id="results" th:fragment="results">
+        <p class="text-sm text-base-content/60 mb-2" th:if="${total > 0}"
+           th:text="${#lists.size(references) == total} ? |${total} Titel| : |${#lists.size(references)} von ${total} Titeln|">3 Titel</p>
+
+        <div th:if="${total == 0}" class="card bg-base-100 border border-base-300">
+            <div class="card-body items-center text-center py-14">
+                <img th:src="@{/brand/bildmarke-farbig.svg}" alt="" class="h-14 w-auto dark:hidden">
+                <img th:src="@{/brand/bildmarke-weiss.svg}" alt="" class="h-14 w-auto hidden dark:block">
+                <h2 class="text-xl mt-3">Noch keine Literatur</h2>
+                <p class="text-base-content/70 max-w-md">Füge deinen ersten Titel hinzu – am schnellsten per DOI oder ISBN.
+                    Vorhandene Literaturlisten kannst du unter „Literaturverzeichnis &amp; Export“ als BibTeX importieren.</p>
+                <a class="btn btn-primary mt-2" th:href="@{/projects/{id}/references/new(id=${project.id})}">Ersten Titel hinzufügen</a>
+            </div>
+        </div>
+
+        <div th:if="${total > 0 and #lists.isEmpty(references)}" class="alert">Keine Treffer für diese Suche.</div>
+
+        <ul th:if="${!#lists.isEmpty(references)}" class="bg-base-100 border border-base-300 rounded-box divide-y divide-base-300">
+            <li th:each="s : ${references}">
+                <a class="flex gap-4 p-4 hover:bg-base-200 transition-colors"
+                   th:href="@{/projects/{p}/references/{r}(p=${project.id},r=${s.reference.id})}">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex flex-wrap items-baseline gap-x-2">
+                            <span class="font-semibold" th:text="${s.reference.title}">Titel</span>
+                            <span class="text-base-content/70" th:if="${s.reference.subtitle}" th:text="${s.reference.subtitle}">Untertitel</span>
+                        </div>
+                        <div class="text-sm text-base-content/70 mt-0.5">
+                            <span th:text="${s.authorsShort != '' ? s.authorsShort : 'o. A.'}">Müller</span>
+                            · <span th:text="${s.reference.year ?: 'o. J.'}">2020</span>
+                            <th:block th:if="${s.reference.containerTitle}"> · <i th:text="${s.reference.containerTitle}">Zeitschrift</i></th:block>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-end gap-1 shrink-0 text-xs">
+                        <span class="badge badge-ghost badge-sm" th:text="${s.reference.type.label}">Buch</span>
+                        <span class="badge badge-primary badge-sm" th:if="${s.attachmentCount > 0}"
+                              th:text="${s.attachmentCount == 1} ? 'PDF' : |${s.attachmentCount} PDFs|">PDF</span>
+                        <span class="badge badge-accent badge-sm" th:if="${s.knowledgeCount > 0}"
+                              th:text="|${s.knowledgeCount} Wissen|">2 Wissen</span>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+</main>
+</body>
+</html>

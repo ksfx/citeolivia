@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="layout(title, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} ? ${title} + ' · CiteOlivia' : 'CiteOlivia'">CiteOlivia</title>
+    <meta name="description" content="CiteOlivia – Literatur- und Referenzverwaltung. Große Gedanken. Sauber belegt.">
+    <meta name="theme-color" content="#6D31D6">
+    <link rel="icon" th:href="@{/brand/favicon.svg}" type="image/svg+xml">
+    <link rel="icon" th:href="@{/brand/favicon-32.png}" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" th:href="@{/brand/apple-touch-icon.png}">
+    <link rel="manifest" th:href="@{/site.webmanifest}">
+    <link rel="preload" th:href="@{/fonts/inter-latin-wght.woff2}" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/htmx.min.js}" defer></script>
+</head>
+<!-- htmx sends the CSRF token as header with every request. CSRF is never disabled. -->
+<body class="min-h-screen flex flex-col bg-base-200 font-sans text-base-content antialiased"
+      th:hx-headers="|{&quot;${_csrf.headerName}&quot;: &quot;${_csrf.token}&quot;}|">
+<header class="bg-base-100 border-b border-base-300">
+  <div class="navbar max-w-6xl mx-auto px-4 lg:px-8">
+    <div class="flex-1">
+        <a th:href="@{/}" class="inline-flex items-center" aria-label="CiteOlivia – Startseite">
+            <img th:src="@{/brand/logo-horizontal-farbig.svg}" alt="cite olivia" class="h-8 w-auto dark:hidden">
+            <img th:src="@{/brand/logo-horizontal-weiss.svg}" alt="cite olivia" class="h-8 w-auto hidden dark:block">
+        </a>
+    </div>
+    <nav class="flex-none flex items-center gap-1">
+        <th:block sec:authorize="isAnonymous()">
+            <a class="btn btn-ghost" th:href="@{/login}">Anmelden</a>
+            <a class="btn btn-primary" th:href="@{/register}">Kostenlos registrieren</a>
+        </th:block>
+        <th:block sec:authorize="isAuthenticated()">
+            <a class="btn btn-ghost" th:href="@{/dashboard}">Meine Projekte</a>
+            <a class="btn btn-ghost" sec:authorize="hasAuthority('users:read')" th:href="@{/admin/users}">Benutzer</a>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-outline">Abmelden</button>
+            </form>
+        </th:block>
+    </nav>
+  </div>
+</header>
+<main class="flex-1 w-full max-w-6xl mx-auto px-4 lg:px-8 py-8" th:replace="${content}"></main>
+<footer class="border-t border-base-300 bg-base-100">
+    <div class="max-w-6xl mx-auto px-4 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-base-content/70">
+        <span class="inline-flex items-center gap-2">
+            <img th:src="@{/brand/bildmarke-farbig.svg}" alt="" class="h-5 w-auto dark:hidden">
+            <img th:src="@{/brand/bildmarke-weiss.svg}" alt="" class="h-5 w-auto hidden dark:block">
+            <span class="font-display font-semibold text-base-content">CiteOlivia</span>
+        </span>
+        <span class="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <a class="link link-hover" th:href="@{/word-add-in}">CiteOlivia für Word</a>
+            <span>Große Gedanken. Sauber belegt.</span>
+        </span>
+    </div>
+</footer>
+</body>
+</html>

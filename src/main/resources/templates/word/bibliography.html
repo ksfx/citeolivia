@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Bibliography as HTML for Word (Range.insertHtml): one paragraph per entry, hanging indent. -->
+<th:block th:fragment="entries">
+    <p th:each="e : ${entries}" style="margin:0 0 6pt 1.27cm; text-indent:-1.27cm" th:utext="${e.citationHtml}">LeCun, Y. (2015). <i>Deep learning</i>.</p>
+    <p th:if="${#lists.isEmpty(entries)}" style="margin:0"><i>Noch keine Zitate aus CiteOlivia im Dokument.</i></p>
+</th:block>
+</body>
+</html>

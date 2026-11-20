@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{word/layout :: layout('Word', ~{::main})}">
+<body>
+<main class="p-3 flex flex-col gap-3">
+    <header class="flex items-center justify-between gap-2">
+        <img th:src="@{/brand/logo-horizontal-farbig.svg}" alt="cite olivia" class="h-6 w-auto dark:hidden">
+        <img th:src="@{/brand/logo-horizontal-weiss.svg}" alt="cite olivia" class="h-6 w-auto hidden dark:block">
+        <form th:action="@{/word/logout}" method="post">
+            <button type="submit" class="btn btn-ghost btn-xs" th:title="|Angemeldet als ${user.email()}|">Abmelden</button>
+        </form>
+    </header>
+
+    <!-- Office/Word not available (e.g. page opened in a normal browser). Shown by word-addin.js. -->
+    <div id="no-word" role="alert" class="alert alert-warning hidden">
+        Diese Seite funktioniert nur innerhalb von Word.
+    </div>
+
+    <div th:if="${#lists.isEmpty(projects)}" class="alert alert-info">
+        <span>Du hast noch kein Projekt.
+            <a class="link" th:href="@{/dashboard}" target="_blank" rel="noopener">Lege in CiteOlivia eines an</a>
+            und lade diese Seitenleiste danach neu.</span>
+    </div>
+
+    <label class="flex flex-col gap-1" th:if="${!#lists.isEmpty(projects)}">
+        <span class="font-semibold">Projekt für dieses Dokument</span>
+        <select id="project" class="select select-sm w-full">
+            <option value="">Bitte wählen …</option>
+            <option th:each="p : ${projects}" th:value="${p.project().id}" th:text="${p.project().name}">Masterarbeit</option>
+        </select>
+    </label>
+
+    <!-- Status messages of document operations; the classes are listed here so that Tailwind generates them. -->
+    <div id="status" role="status" class="hidden"
+         data-class-info="alert alert-info" data-class-success="alert alert-success" data-class-error="alert alert-error"></div>
+
+    <div id="panel"></div>
+</main>
+
+<!-- Panel of the selected project -->
+<div th:fragment="panel" class="flex flex-col gap-3" th:data-project-id="${project.id}">
+    <form class="flex flex-col gap-1"
+          th:hx-post="@{/word/projects/{id}/style(id=${project.id})}" hx-trigger="change" hx-target="#panel">
+        <label for="style" class="font-semibold">Zitierstil</label>
+        <select id="style" name="style" class="select select-sm w-full">
+            <option th:each="s : ${citationStyles}" th:value="${s}" th:text="${s.label}"
+                    th:selected="${s == project.citationStyle}">APA 7</option>
+        </select>
+        <!-- word-addin.js updates all citations after a style change -->
+        <span th:if="${styleChanged}" id="style-changed" class="hidden"></span>
+    </form>
+
+    <div class="flex flex-col gap-1">
+        <label for="q" class="font-semibold">Titel suchen</label>
+        <input id="q" type="search" name="q" class="input input-sm w-full" placeholder="Titel, Person, Jahr …"
+               th:hx-get="@{/word/projects/{id}/search(id=${project.id})}"
+               hx-trigger="input changed delay:300ms, search" hx-target="#results">
+    </div>
+    <label class="flex items-center gap-2">
+        <span class="shrink-0">Seite</span>
+        <input id="pages" type="text" class="input input-sm w-full" placeholder="z. B. 436 oder 436-438 (optional)" maxlength="40">
+    </label>
+
+    <div id="results" th:hx-get="@{/word/projects/{id}/search(id=${project.id})}" hx-trigger="load"></div>
+
+    <div class="flex flex-col gap-2 border-t border-base-300 pt-3">
+        <button type="button" class="btn btn-primary btn-sm" data-action="bibliography">Literaturverzeichnis einfügen / aktualisieren</button>
+        <button type="button" class="btn btn-outline btn-sm" data-action="refresh">Alle Zitate aktualisieren</button>
+        <p class="text-xs text-base-content/60">Das Literaturverzeichnis wird nach dem aktuellen Absatz eingefügt und enthält alle im Dokument zitierten Titel.</p>
+    </div>
+</div>
+
+<!-- Search results -->
+<div th:fragment="results">
+    <p th:if="${#lists.isEmpty(results)}" class="text-base-content/70"
+       th:text="${q != null and !#strings.isEmpty(q)} ? 'Keine Treffer.' : 'Dieses Projekt hat noch keine Titel.'">Keine Treffer.</p>
+    <ul th:if="${!#lists.isEmpty(results)}" class="border border-base-300 rounded-box divide-y divide-base-300">
+        <li th:each="s : ${results}" class="flex items-start gap-2 p-2">
+            <div class="flex-1 min-w-0">
+                <div class="font-semibold leading-snug" th:text="${s.reference.title}">Deep learning</div>
+                <div class="text-xs text-base-content/70">
+                    <span th:text="${s.authorsShort != '' ? s.authorsShort : 'o. A.'}">LeCun et al.</span>
+                    · <span th:text="${s.reference.year ?: 'o. J.'}">2015</span>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary btn-xs shrink-0" data-action="cite"
+                    th:data-reference-id="${s.reference.id}" th:title="|Zitat einfügen: ${s.inText}|">Zitieren</button>
+        </li>
+    </ul>
+    <p th:if="${more > 0}" class="text-xs text-base-content/60 mt-1" th:text="|… und ${more} weitere. Suche genauer.|">… und 3 weitere.</p>
+</div>
+</body>
+</html>

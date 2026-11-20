@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Meine Projekte', ~{::main})}">
+<body>
+<main class="flex-1 w-full max-w-6xl mx-auto px-4 lg:px-8 py-8">
+    <h1 class="text-3xl">Hallo, <span th:text="${user.displayName()}">Name</span>!</h1>
+    <p class="mt-1 text-base-content/70">Deine Literaturprojekte</p>
+
+    <div class="alert mt-4 bg-base-100 border-base-300">
+        <img th:src="@{/word/icon-32.png}" alt="" width="24" height="24" class="w-6 h-6">
+        <span>Zitierst du in Word? Mit dem <strong>CiteOlivia-Add-in</strong> fügst du Zitate und das Literaturverzeichnis direkt ein.</span>
+        <a class="btn btn-sm btn-primary" th:href="@{/word-add-in}">Add-in einrichten</a>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+        <a th:each="p : ${projects}" th:href="@{/projects/{id}/references(id=${p.project.id})}"
+           class="card bg-base-100 border border-base-300 hover:border-primary transition-colors">
+            <div class="card-body">
+                <h2 class="card-title text-xl" th:text="${p.project.name}">Masterarbeit</h2>
+                <p class="text-base-content/70 line-clamp-2" th:if="${p.project.description}" th:text="${p.project.description}"></p>
+                <div class="flex flex-wrap gap-2 mt-2 text-sm">
+                    <span class="badge badge-ghost" th:text="|${p.references} Titel|">0 Titel</span>
+                    <span class="badge badge-ghost" th:text="|${p.knowledgeItems} Wissenselemente|">0</span>
+                    <span class="badge badge-accent" th:text="${p.project.citationStyle.label}">APA 7</span>
+                </div>
+            </div>
+        </a>
+
+        <div class="card bg-base-100 border border-dashed border-base-300">
+            <form class="card-body" th:action="@{/projects}" th:object="${form}" method="post">
+                <h2 class="card-title text-xl">Neues Projekt</h2>
+                <fieldset class="fieldset">
+                    <legend class="fieldset-legend">Name</legend>
+                    <input class="input w-full" type="text" th:field="*{name}" placeholder="z. B. Masterarbeit"
+                           th:classappend="${#fields.hasErrors('name')} ? 'input-error'" required>
+                    <p class="text-sm text-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
+                </fieldset>
+                <fieldset class="fieldset">
+                    <legend class="fieldset-legend">Beschreibung (optional)</legend>
+                    <textarea class="textarea w-full" rows="2" th:field="*{description}"></textarea>
+                </fieldset>
+                <label class="flex items-start gap-2 text-sm cursor-pointer mt-1">
+                    <input type="checkbox" class="checkbox checkbox-sm checkbox-primary" th:field="*{thesisOutline}">
+                    <span>Gliederungsvorlage für Abschlussarbeiten anlegen<br>
+                        <span class="text-base-content/60">Einleitung, Grundlagen, Methodik, Ergebnisse, Diskussion, Fazit</span></span>
+                </label>
+                <button type="submit" class="btn btn-primary mt-2">Projekt anlegen</button>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

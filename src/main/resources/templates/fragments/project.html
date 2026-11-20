@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Project header with tabs. Expects ${project}. -->
+<div th:fragment="projectHeader(active)" class="mb-6">
+    <div class="flex flex-wrap items-end justify-between gap-2">
+        <div>
+            <a th:href="@{/dashboard}" class="text-sm link link-hover text-base-content/70">← Alle Projekte</a>
+            <h1 class="text-3xl mt-1" th:text="${project.name}">Projekt</h1>
+        </div>
+        <span id="style-badge" class="badge badge-accent" title="Zitierstil des Projekts" th:text="${project.citationStyle.label}">APA 7</span>
+    </div>
+    <nav role="tablist" class="tabs tabs-border mt-4 overflow-x-auto flex-nowrap">
+        <a role="tab" class="tab whitespace-nowrap" th:classappend="${active == 'references'} ? 'tab-active'"
+           th:href="@{/projects/{id}/references(id=${project.id})}">Literatur</a>
+        <a role="tab" class="tab whitespace-nowrap" th:classappend="${active == 'knowledge'} ? 'tab-active'"
+           th:href="@{/projects/{id}/knowledge(id=${project.id})}">Wissen</a>
+        <a role="tab" class="tab whitespace-nowrap" th:classappend="${active == 'categories'} ? 'tab-active'"
+           th:href="@{/projects/{id}/categories(id=${project.id})}">Gliederung</a>
+        <a role="tab" class="tab whitespace-nowrap" th:classappend="${active == 'bibliography'} ? 'tab-active'"
+           th:href="@{/projects/{id}/bibliography(id=${project.id})}">Literaturverzeichnis &amp; Export</a>
+        <a role="tab" class="tab whitespace-nowrap" th:classappend="${active == 'settings'} ? 'tab-active'"
+           th:href="@{/projects/{id}/settings(id=${project.id})}">Einstellungen</a>
+    </nav>
+    <div th:if="${message}" role="alert" class="alert alert-success mt-4" th:text="${message}">Gespeichert</div>
+    <div th:if="${error}" role="alert" class="alert alert-error mt-4" th:text="${error}">Fehler</div>
+</div>
+</body>
+</html>

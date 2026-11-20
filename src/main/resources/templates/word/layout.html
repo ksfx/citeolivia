@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' · CiteOlivia'">CiteOlivia</title>
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <link rel="icon" th:href="@{/brand/favicon.svg}" type="image/svg+xml">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <!-- Office.js must be loaded from Microsoft's CDN, on every page of the task pane. -->
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script th:src="@{/js/htmx.min.js}" defer></script>
+    <script th:src="@{/js/word-addin.js}" defer></script>
+</head>
+<!-- Task pane of the Word add-in (narrow, ~320 px). htmx sends the CSRF token as header. -->
+<body class="min-h-screen bg-base-100 font-sans text-base-content antialiased text-sm"
+      th:data-base="@{/word}"
+      th:hx-headers="|{&quot;${_csrf.headerName}&quot;: &quot;${_csrf.token}&quot;}|">
+<main th:replace="${content}"></main>
+</body>
+</html>

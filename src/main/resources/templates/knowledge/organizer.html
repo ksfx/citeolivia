@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(${project.name}, ~{::main})}">
+<body>
+<main class="flex-1 w-full max-w-6xl mx-auto px-4 lg:px-8 py-8" th:with="showSource=true">
+    <div th:replace="~{fragments/project :: projectHeader('knowledge')}"></div>
+
+    <div class="grid lg:grid-cols-4 gap-6">
+        <aside class="lg:col-span-1">
+            <div class="card bg-base-100 border border-base-300 lg:sticky lg:top-4">
+                <div class="card-body p-4">
+                    <h2 class="font-semibold">Wissensorganisator</h2>
+                    <p class="text-sm text-base-content/70">Zitate und Gedanken, geordnet nach deiner Gliederung.</p>
+                    <ul class="menu menu-sm px-0 w-full">
+                        <li><a th:href="@{/projects/{id}/knowledge(id=${project.id})}" th:classappend="${category == null} ? 'menu-active'">Alle Kategorien</a></li>
+                        <li th:each="c : ${outline}">
+                            <a th:href="@{/projects/{id}/knowledge(id=${project.id},category=${c.id})}"
+                               th:classappend="${c.id == category} ? 'menu-active'"
+                               th:style="|padding-left: ${0.75 + c.depth}rem|" th:text="${c.label()}">1 Einleitung</a>
+                        </li>
+                    </ul>
+                    <a class="btn btn-sm btn-outline mt-2" th:href="@{/projects/{id}/knowledge/export.md(id=${project.id})}">Als Markdown exportieren</a>
+                    <a class="link link-primary text-sm" th:href="@{/projects/{id}/categories(id=${project.id})}">Gliederung bearbeiten</a>
+                </div>
+            </div>
+        </aside>
+
+        <div class="lg:col-span-3 flex flex-col gap-6">
+            <details class="collapse collapse-arrow bg-base-100 border border-base-300" th:open="${openThought == true}">
+                <summary class="collapse-title font-semibold">+ Eigenen Gedanken notieren</summary>
+                <div class="collapse-content">
+                    <form th:action="@{/projects/{id}/knowledge(id=${project.id})}" th:object="${knowledgeForm}" method="post">
+                        <th:block th:replace="~{knowledge/card :: fields(false)}"></th:block>
+                        <button type="submit" class="btn btn-primary btn-sm mt-3">Gedanken speichern</button>
+                    </form>
+                </div>
+            </details>
+
+            <section th:each="s : ${sections}">
+                <h2 class="text-xl flex items-baseline gap-2 mb-3"
+                    th:classappend="${s.category != null and s.category.depth > 0} ? 'text-lg'">
+                    <span th:text="${s.category != null} ? ${s.category.label()} : 'Ohne Kategorie'">1 Einleitung</span>
+                    <span class="badge badge-ghost badge-sm" th:text="${#lists.size(s.items)}">0</span>
+                </h2>
+                <p th:if="${#lists.isEmpty(s.items)}" class="text-sm text-base-content/60 mb-2">Noch nichts zugeordnet.</p>
+                <div class="flex flex-col gap-3">
+                    <th:block th:each="k : ${s.items}">
+                        <article th:replace="~{knowledge/card :: card}"></article>
+                    </th:block>
+                </div>
+            </section>
+
+            <div th:if="${#lists.isEmpty(outline) and #lists.size(sections) == 1 and #lists.isEmpty(sections[0].items)}"
+                 class="card bg-base-100 border border-base-300">
+                <div class="card-body items-center text-center">
+                    <h2 class="text-xl">Noch kein Wissen gesammelt</h2>
+                    <p class="text-base-content/70 max-w-md">Öffne einen Titel unter „Literatur“ und halte dort Zitate, Paraphrasen und Kommentare fest.
+                        Lege unter „Gliederung“ deine Kapitel an, um alles danach zu ordnen.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

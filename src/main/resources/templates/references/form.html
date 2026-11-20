@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(${project.name}, ~{::main})}">
+<body>
+<main class="flex-1 w-full max-w-6xl mx-auto px-4 lg:px-8 py-8">
+    <div th:replace="~{fragments/project :: projectHeader('references')}"></div>
+
+    <h2 class="text-2xl mb-4" th:text="${existing} ? 'Titel bearbeiten' : 'Titel hinzufügen'">Titel hinzufügen</h2>
+
+    <!-- Lookup by DOI/ISBN (only for new references) -->
+    <form th:unless="${existing}" class="card bg-accent mb-6"
+          th:hx-post="@{/projects/{id}/references/lookup(id=${project.id})}"
+          hx-target="#reference-form" hx-swap="outerHTML" hx-indicator="#lookup-spinner">
+        <div class="card-body py-4">
+            <label for="identifier" class="font-semibold">Per DOI oder ISBN übernehmen</label>
+            <div class="flex flex-wrap gap-2">
+                <input id="identifier" name="identifier" class="input flex-1 min-w-60" type="text"
+                       placeholder="z. B. 10.1038/nature14539 oder 978-3-658-35601-0" autocomplete="off">
+                <button type="submit" class="btn btn-primary">Daten abrufen
+                    <span id="lookup-spinner" class="loading loading-spinner loading-sm htmx-indicator"></span></button>
+            </div>
+            <p class="text-xs text-base-content/70">Abfrage bei Crossref (DOI) bzw. Open Library, Deutscher Nationalbibliothek und Google Books (ISBN). Übertragen wird nur die DOI/ISBN.</p>
+        </div>
+    </form>
+
+    <div id="reference-form" th:fragment="referenceForm">
+        <div th:if="${lookupMessage}" role="alert" class="alert mb-4"
+             th:classappend="${lookupFound} ? 'alert-success' : 'alert-warning'" th:text="${lookupMessage}">Gefunden</div>
+        <div th:if="${duplicate}" role="alert" class="alert alert-warning mb-4">
+            <span>Dieser Titel ist schon im Projekt:
+                <a class="link font-semibold" th:href="@{/projects/{p}/references/{r}(p=${project.id},r=${duplicate.id})}"
+                   th:text="${duplicate.title}">Titel</a></span>
+        </div>
+
+        <form class="grid lg:grid-cols-3 gap-6" th:object="${form}" method="post"
+              th:action="${existing} ? @{/projects/{p}/references/{r}(p=${project.id},r=${existing.id})} : @{/projects/{p}/references(p=${project.id})}">
+            <div class="lg:col-span-2 card bg-base-100 border border-base-300">
+                <div class="card-body gap-0">
+                    <fieldset class="fieldset">
+                        <legend class="fieldset-legend">Dokumenttyp</legend>
+                        <select class="select w-full" th:field="*{draft.type}"
+                                th:hx-post="@{/projects/{id}/references/fields(id=${project.id})}"
+                                hx-trigger="change" hx-target="#type-fields" hx-swap="outerHTML" hx-include="closest form">
+                            <option th:each="t : ${referenceTypes}" th:value="${t}" th:text="${t.label}">Buch</option>
+                        </select>
+                    </fieldset>
+                    <fieldset class="fieldset">
+                        <legend class="fieldset-legend">Autor:innen</legend>
+                        <textarea class="textarea w-full font-mono text-sm" rows="3" th:field="*{authors}"
+                                  placeholder="Eine Person pro Zeile: Nachname, Vorname&#10;Institutionen ohne Komma, z. B. Statistisches Bundesamt"></textarea>
+                    </fieldset>
+                    <div th:replace="~{fragments/forms :: textField('draft.title', 'Titel')}"></div>
+                    <div th:replace="~{fragments/forms :: textField('draft.subtitle', 'Untertitel')}"></div>
+                    <div class="max-w-40" th:insert="~{fragments/forms :: textField('draft.year', 'Jahr')}"></div>
+
+                    <div id="type-fields" th:fragment="fields" th:object="${form}" class="grid sm:grid-cols-2 gap-x-4">
+                        <fieldset class="fieldset sm:col-span-2" th:if="${form.type.has(F.EDITORS)}">
+                            <legend class="fieldset-legend">Herausgeber:innen</legend>
+                            <textarea class="textarea w-full font-mono text-sm" rows="2" th:field="*{editors}"
+                                      placeholder="Eine Person pro Zeile: Nachname, Vorname"></textarea>
+                        </fieldset>
+                        <div class="sm:col-span-2" th:if="${form.type.has(F.CONTAINER_TITLE)}"
+                             th:insert="~{fragments/forms :: textField('draft.containerTitle', ${form.type.label(F.CONTAINER_TITLE)})}"></div>
+                        <div th:if="${form.type.has(F.PUBLISHER)}" th:insert="~{fragments/forms :: textField('draft.publisher', ${form.type.label(F.PUBLISHER)})}"></div>
+                        <div th:if="${form.type.has(F.PLACE)}" th:insert="~{fragments/forms :: textField('draft.place', ${form.type.label(F.PLACE)})}"></div>
+                        <div th:if="${form.type.has(F.EDITION)}" th:insert="~{fragments/forms :: textField('draft.edition', ${form.type.label(F.EDITION)})}"></div>
+                        <div th:if="${form.type.has(F.SERIES)}" th:insert="~{fragments/forms :: textField('draft.series', ${form.type.label(F.SERIES)})}"></div>
+                        <div th:if="${form.type.has(F.VOLUME)}" th:insert="~{fragments/forms :: textField('draft.volume', ${form.type.label(F.VOLUME)})}"></div>
+                        <div th:if="${form.type.has(F.ISSUE)}" th:insert="~{fragments/forms :: textField('draft.issue', ${form.type.label(F.ISSUE)})}"></div>
+                        <div th:if="${form.type.has(F.PAGES)}" th:insert="~{fragments/forms :: textField('draft.pages', ${form.type.label(F.PAGES)})}"></div>
+                        <div th:if="${form.type.has(F.GENRE)}" th:insert="~{fragments/forms :: textField('draft.genre', ${form.type.label(F.GENRE)})}"></div>
+                        <div th:if="${form.type.has(F.ISBN)}" th:insert="~{fragments/forms :: textField('draft.isbn', ${form.type.label(F.ISBN)})}"></div>
+                        <div th:if="${form.type.has(F.DOI)}" th:insert="~{fragments/forms :: textField('draft.doi', ${form.type.label(F.DOI)})}"></div>
+                        <div class="sm:col-span-2" th:if="${form.type.has(F.URL)}" th:insert="~{fragments/forms :: textField('draft.url', ${form.type.label(F.URL)})}"></div>
+                        <fieldset class="fieldset" th:if="${form.type.has(F.ACCESSED_ON)}">
+                            <legend class="fieldset-legend" th:text="${form.type.label(F.ACCESSED_ON)}">Zugriff am</legend>
+                            <input class="input w-full" type="date" th:field="*{draft.accessedOn}">
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 border border-base-300">
+                <div class="card-body gap-0">
+                    <div th:replace="~{fragments/forms :: categories}"></div>
+                    <fieldset class="fieldset">
+                        <legend class="fieldset-legend">Schlagwörter</legend>
+                        <input class="input w-full" type="text" th:field="*{draft.keywords}" placeholder="durch Komma getrennt">
+                    </fieldset>
+                    <fieldset class="fieldset">
+                        <legend class="fieldset-legend">Abstract</legend>
+                        <textarea class="textarea w-full" rows="4" th:field="*{draft.abstractText}"></textarea>
+                    </fieldset>
+                    <fieldset class="fieldset">
+                        <legend class="fieldset-legend">Notizen</legend>
+                        <textarea class="textarea w-full" rows="3" th:field="*{draft.notes}"></textarea>
+                    </fieldset>
+                    <fieldset class="fieldset" th:if="${existing}">
+                        <legend class="fieldset-legend">Zitierschlüssel (BibTeX)</legend>
+                        <input class="input w-full font-mono" type="text" th:field="*{citationKey}"
+                               th:classappend="${#fields.hasErrors('citationKey')} ? 'input-error'">
+                        <p class="text-sm text-error" th:if="${#fields.hasErrors('citationKey')}" th:errors="*{citationKey}"></p>
+                    </fieldset>
+                    <div class="flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary flex-1">Speichern</button>
+                        <a class="btn btn-ghost"
+                           th:href="${existing} ? @{/projects/{p}/references/{r}(p=${project.id},r=${existing.id})} : @{/projects/{p}/references(p=${project.id})}">Abbrechen</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

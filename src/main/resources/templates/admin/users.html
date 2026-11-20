@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Benutzer', ~{::main})}">
+<body>
+<main class="flex-1 w-full max-w-6xl mx-auto px-4 lg:px-8 py-8">
+    <h1 class="text-3xl mb-6">Benutzer</h1>
+    <div class="overflow-x-auto bg-base-100 rounded-box border border-base-300">
+        <table class="table">
+            <thead><tr><th>E-Mail</th><th>Name</th><th>Rollen</th><th>Aktiv</th><th>Registriert</th></tr></thead>
+            <tbody>
+            <tr th:each="u : ${users}">
+                <td class="font-mono" th:text="${u.email()}"></td>
+                <td th:text="${u.displayName()}"></td>
+                <td th:text="${u.roles()}"></td>
+                <td th:text="${u.enabled()} ? 'ja' : 'nein'"></td>
+                <td th:text="${u.createdAtFormatted()}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

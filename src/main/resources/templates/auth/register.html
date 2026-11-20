@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Registrieren', ~{::main})}">
+<body>
+<main class="flex-1 flex justify-center items-start px-4 py-12">
+    <div class="card w-full max-w-md bg-base-100 border border-base-300">
+        <form class="card-body" th:action="@{/register}" th:object="${form}" method="post" novalidate>
+            <div th:replace="~{fragments/auth-card :: brand('Konto erstellen')}"></div>
+            <div th:if="${#fields.hasGlobalErrors()}" role="alert" class="alert alert-error">
+                <span th:each="e : ${#fields.globalErrors()}" th:text="${e}"></span>
+            </div>
+
+            <label class="floating-label">
+                <span>E-Mail</span>
+                <input class="input w-full" type="email" th:field="*{email}" placeholder="E-Mail" autocomplete="email"
+                       th:classappend="${#fields.hasErrors('email')} ? 'input-error'"
+                       th:hx-get="@{/register/email-check}" hx-trigger="input changed delay:400ms"
+                       hx-target="#email-hint" hx-swap="outerHTML" required>
+            </label>
+            <p id="email-hint" class="text-sm text-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+            <p id="email-hint" class="text-sm" th:unless="${#fields.hasErrors('email')}"></p>
+
+            <label class="floating-label">
+                <span>Name</span>
+                <input class="input w-full" type="text" th:field="*{displayName}" placeholder="Name" autocomplete="name"
+                       th:classappend="${#fields.hasErrors('displayName')} ? 'input-error'" required>
+            </label>
+            <p class="text-sm text-error" th:if="${#fields.hasErrors('displayName')}" th:errors="*{displayName}"></p>
+
+            <label class="floating-label">
+                <span>Passwort (min. 12 Zeichen)</span>
+                <input class="input w-full" type="password" name="password" id="password" placeholder="Passwort (min. 12 Zeichen)"
+                       autocomplete="new-password" th:classappend="${#fields.hasErrors('password')} ? 'input-error'" required>
+            </label>
+            <p class="text-sm text-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+
+            <label class="floating-label">
+                <span>Passwort wiederholen</span>
+                <input class="input w-full" type="password" name="passwordConfirm" id="passwordConfirm" placeholder="Passwort wiederholen"
+                       autocomplete="new-password" th:classappend="${#fields.hasErrors('passwordConfirmed')} ? 'input-error'" required>
+            </label>
+            <p class="text-sm text-error" th:if="${#fields.hasErrors('passwordConfirmed')}" th:errors="*{passwordConfirmed}"></p>
+
+            <button type="submit" class="btn btn-primary mt-2">Registrieren</button>
+            <p class="text-sm">Schon registriert? <a class="link link-primary" th:href="@{/login}">Anmelden</a></p>
+        </form>
+    </div>
+</main>
+</body>
+</html>

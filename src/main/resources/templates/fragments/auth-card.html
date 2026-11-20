@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Brand header for login/registration cards -->
+<div th:fragment="brand(heading)" class="flex flex-col items-center text-center mb-2">
+    <img th:src="@{/brand/bildmarke-farbig.svg}" alt="" class="h-12 w-auto dark:hidden">
+    <img th:src="@{/brand/bildmarke-weiss.svg}" alt="" class="h-12 w-auto hidden dark:block">
+    <h1 class="text-2xl mt-4" th:text="${heading}">Titel</h1>
+</div>
+</body>
+</html>

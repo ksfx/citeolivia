@@ -1,0 +1,63 @@
+package com.citeolivia.web;
+
+import com.citeolivia.user.EmailAlreadyRegisteredException;
+import com.citeolivia.user.RegistrationCommand;
+import com.citeolivia.user.UserService;
+import jakarta.validation.Valid;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+class AuthController {
+
+    private final UserService userService;
+
+    AuthController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping("/login")
+    String login() {
+        return "auth/login";
+    }
+
+    @GetMapping("/register")
+    String registerForm(Model model) {
+        model.addAttribute("form", RegistrationForm.empty());
+        return "auth/register";
+    }
+
+    @PostMapping("/register")
+    String register(
+            @Valid @ModelAttribute("form") RegistrationForm form, BindingResult binding, RedirectAttributes redirect) {
+        if (!binding.hasFieldErrors("email") && !userService.isEmailAvailable(form.email())) {
+            binding.rejectValue("email", "duplicate", "Diese E-Mail ist bereits registriert");
+        }
+        if (binding.hasErrors()) {
+            return "auth/register";
+        }
+        try {
+            userService.register(new RegistrationCommand(form.email(), form.displayName(), form.password()));
+        } catch (EmailAlreadyRegisteredException e) {
+            binding.rejectValue("email", "duplicate", "Diese E-Mail ist bereits registriert");
+            return "auth/register";
+        }
+        redirect.addAttribute("registered", "");
+        return "redirect:/login";
+    }
+
+    /** htmx endpoint: returns an HTML fragment with the availability hint for the email field. */
+    @GetMapping("/register/email-check")
+    String emailCheck(@RequestParam(defaultValue = "") String email, Model model) {
+        boolean blank = email.isBlank();
+        model.addAttribute("blank", blank);
+        model.addAttribute("available", !blank && userService.isEmailAvailable(email));
+        return "fragments/email-check :: hint";
+    }
+}

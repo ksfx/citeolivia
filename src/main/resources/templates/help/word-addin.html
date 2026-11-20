@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/layout :: layout('CiteOlivia für Word', ~{::main})}">
+<body>
+<main class="flex-1 w-full max-w-6xl mx-auto px-4 lg:px-8 py-12 lg:py-16">
+
+    <!-- Hero -->
+    <section class="grid lg:grid-cols-[1fr_auto] gap-10 items-center">
+        <div>
+            <span class="badge badge-accent mb-4">Word-Add-in · Windows, Mac und Browser</span>
+            <h1 class="text-4xl lg:text-5xl leading-tight">CiteOlivia für Word</h1>
+            <p class="mt-5 text-lg text-base-content/80 max-w-prose">
+                Zitiere direkt beim Schreiben: Titel aus deinem CiteOlivia-Projekt suchen, Zitat mit Seitenangabe einfügen
+                und das Literaturverzeichnis per Klick erzeugen, immer im richtigen Zitierstil.
+            </p>
+            <div class="mt-8 flex flex-wrap gap-3">
+                <a class="btn btn-primary btn-lg" th:href="@{/word/manifest.xml}" download>Add-in herunterladen</a>
+                <a class="btn btn-ghost btn-lg" href="#installation">Zur Installationsanleitung</a>
+            </div>
+            <p class="mt-3 text-sm text-base-content/60">
+                Kostenlos für alle mit CiteOlivia-Konto. Lädt die Datei <code>citeolivia-word-addin.xml</code> herunter (für alle Systeme dieselbe).
+            </p>
+        </div>
+        <div class="flex justify-center">
+            <div class="rounded-box bg-accent p-6 lg:p-8">
+                <img th:src="@{/word/taskpane-preview.png}" width="340" height="560"
+                     alt="Seitenleiste von CiteOlivia in Word: Projekt wählen, Titel suchen, Zitieren, Literaturverzeichnis einfügen"
+                     class="w-64 lg:w-72 h-auto rounded-box border border-base-300 bg-base-100">
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="card bg-base-100 border border-base-300">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Zitieren mit Seite</h2>
+                <p class="text-base-content/75">Titel suchen, Seite angeben, klicken, z. B. „(LeCun et al., 2015, S. 436)“.</p>
+            </div>
+        </div>
+        <div class="card bg-base-100 border border-base-300">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Literaturverzeichnis</h2>
+                <p class="text-base-content/75">Enthält genau die zitierten Titel, sortiert und mit hängendem Einzug.</p>
+            </div>
+        </div>
+        <div class="card bg-base-100 border border-base-300">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Stil wechseln</h2>
+                <p class="text-base-content/75">APA 7 oder DIN ISO 690: alle Zitate im Dokument passen sich sofort an.</p>
+            </div>
+        </div>
+        <div class="card bg-base-100 border border-base-300">
+            <div class="card-body">
+                <h2 class="card-title text-lg">Immer aktuell</h2>
+                <p class="text-base-content/75">Korrigierst du einen Titel in CiteOlivia, übernimmt Word ihn mit einem Klick.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Requirements -->
+    <section class="mt-16 grid lg:grid-cols-3 gap-8">
+        <div>
+            <h2 class="text-2xl">Das brauchst du</h2>
+        </div>
+        <ul class="lg:col-span-2 list-disc ps-5 space-y-2 text-base-content/85">
+            <li><strong>Word mit Microsoft 365</strong> oder Word 2019, 2021 bzw. 2024, für Windows oder Mac. Alternativ <strong>Word im Browser</strong> über office.com.</li>
+            <li>Ein <strong>CiteOlivia-Konto</strong> mit mindestens einem Projekt.
+                <th:block sec:authorize="isAnonymous()">Noch keins? <a class="link link-primary" th:href="@{/register}">Hier kostenlos registrieren</a>.</th:block>
+            </li>
+            <li>Die <strong>Add-in-Datei</strong>: <a class="link link-primary" th:href="@{/word/manifest.xml}" download>citeolivia-word-addin.xml herunterladen</a>.
+                Sie sagt Word nur, wo CiteOlivia zu finden ist. Sie enthält kein Programm und keine Zugangsdaten.</li>
+        </ul>
+    </section>
+
+    <!-- Installation -->
+    <section id="installation" class="mt-16 scroll-mt-8">
+        <h2 class="text-3xl">Installation</h2>
+        <p class="mt-2 text-base-content/75 max-w-prose">Wähle dein System. Die Einrichtung machst du nur einmal, Updates kommen danach automatisch.</p>
+
+        <div class="tabs tabs-lift mt-6">
+            <!-- Windows -->
+            <input type="radio" name="system" class="tab" aria-label="Windows" checked>
+            <div class="tab-content bg-base-100 border-base-300 p-6 lg:p-8">
+                <p class="text-base-content/80 max-w-prose">
+                    Word für Windows lädt eigene Add-ins aus einem <strong>freigegebenen Ordner</strong>, den du als
+                    „vertrauenswürdigen Katalog“ einträgst. Der Ordner liegt auf deinem eigenen PC, nur du hast Zugriff.
+                </p>
+                <ol class="mt-6 space-y-6">
+                    <li class="flex gap-4">
+                        <span class="badge badge-primary badge-lg shrink-0 font-semibold">1</span>
+                        <div>
+                            <h3 class="font-semibold text-lg">Ordner anlegen und Datei hineinlegen</h3>
+                            <p class="text-base-content/80">Lege im Explorer einen Ordner an, z. B. <code>C:\CiteOlivia-Addin</code>, und verschiebe die heruntergeladene Datei <code>citeolivia-word-addin.xml</code> hinein.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <span class="badge badge-primary badge-lg shrink-0 font-semibold">2</span>
+                        <div>
+                            <h3 class="font-semibold text-lg">Ordner freigeben</h3>
+                            <p class="text-base-content/80">Rechtsklick auf den Ordner → <strong>Eigenschaften</strong> → Reiter <strong>Freigabe</strong> → <strong>Freigeben…</strong> → dein Benutzer ist schon eingetragen → <strong>Freigeben</strong>.</p>
+                            <p class="text-base-content/80 mt-1">Windows zeigt jetzt den <strong>Netzwerkpfad</strong> an, z. B. <code>\\MEIN-PC\CiteOlivia-Addin</code>. Kopiere ihn, du brauchst ihn gleich.</p>
+                            <div class="alert alert-info alert-soft mt-3">
+                                <span><strong>Kurz prüfen:</strong> <kbd class="kbd kbd-sm">Windows</kbd> + <kbd class="kbd kbd-sm">R</kbd> drücken, den Netzwerkpfad einfügen, <strong>OK</strong>. Öffnet sich der Ordner mit der Datei, passt alles.</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <span class="badge badge-primary badge-lg shrink-0 font-semibold">3</span>
+                        <div>
+                            <h3 class="font-semibold text-lg">Ordner in Word als vertrauenswürdig eintragen</h3>
+                            <p class="text-base-content/80">In Word: <strong>Datei</strong> → <strong>Optionen</strong> → <strong>Trust Center</strong> → <strong>Einstellungen für das Trust Center…</strong> → <strong>Kataloge vertrauenswürdiger Add-Ins</strong>.</p>
+                            <p class="text-base-content/80 mt-1">Bei <strong>Katalog-URL</strong> den Netzwerkpfad einfügen → <strong>Katalog hinzufügen</strong> → in der Liste das Häkchen <strong>Im Menü anzeigen</strong> setzen → <strong>OK</strong>.</p>
+                            <div class="alert alert-warning alert-soft mt-3">
+                                <span>Wichtig ist der <strong>Netzwerkpfad</strong> mit <code>\\</code> am Anfang. Einen normalen Pfad wie <code>C:\…</code> nimmt Word nicht an.</span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <span class="badge badge-primary badge-lg shrink-0 font-semibold">4</span>
+                        <div>
+                            <h3 class="font-semibold text-lg">Word neu starten</h3>
+                            <p class="text-base-content/80">Schließe <strong>alle</strong> Word-Fenster und öffne Word wieder.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <span class="badge badge-primary badge-lg shrink-0 font-semibold">5</span>
+                        <div>
+                            <h3 class="font-semibold text-lg">Add-in hinzufügen</h3>
+                            <p class="text-base-content/80"><strong>Start</strong> → <strong>Add-Ins</strong> → <strong>Weitere Add-Ins</strong> (in älteren Versionen: <strong>Einfügen</strong> → <strong>Meine Add-Ins</strong>) → Reiter <strong>Freigegebener Ordner</strong> → <strong>CiteOlivia</strong> → <strong>Hinzufügen</strong>.</p>
+                            <p class="text-base-content/80 mt-1">Fertig: Rechts auf der Registerkarte <strong>Start</strong> findest du jetzt die Schaltfläche <strong>CiteOlivia</strong>.</p>
+                        </div>
+                    </li>
+                </ol>
+                <p class="mt-6 text-sm text-base-content/60">Firmen-PC und die Felder in Schritt 3 sind ausgegraut? Dann hat deine IT das gesperrt, siehe „Hilfe bei Problemen“ unten.</p>
+            </div>
+
+            <!-- Mac -->
+            <input type="radio" name="system" class="tab" aria-label="Mac">
+            <div class="tab-content bg-base-100 border-base-300 p-6 lg:p-8">
+                <p class="text-base-content/80 max-w-prose">Auf dem Mac legst du die Datei einfach in einen bestimmten Ordner von Word.</p>
+                <ol class="mt-6 space-y-6">
+                    <li class="flex gap-4">
+                        <span class="badge badge-primary badge-lg shrink-0 font-semibold">1</span>
+                        <div>
+                            <h3 class="font-semibold text-lg">Word beenden</h3>
+                            <p class="text-base-content/80">Mit <kbd class="kbd kbd-sm">⌘</kbd> + <kbd class="kbd kbd-sm">Q</kbd>.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <span class="badge badge-primary badge-lg shrink-0 font-semibold">2</span>
+                        <div>
+                            <h3 class="font-semibold text-lg">Ordner von Word öffnen</h3>
+                            <p class="text-base-content/80">Im Finder <kbd class="kbd kbd-sm">⇧</kbd> + <kbd class="kbd kbd-sm">⌘</kbd> + <kbd class="kbd kbd-sm">G</kbd> drücken (<strong>Gehe zu → Gehe zum Ordner…</strong>), diesen Pfad einfügen und <strong>Öffnen</strong>:</p>
+                            <p class="mt-2"><code class="break-all">~/Library/Containers/com.microsoft.Word/Data/Documents/</code></p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <span class="badge badge-primary badge-lg shrink-0 font-semibold">3</span>
+                        <div>
+                            <h3 class="font-semibold text-lg">Datei in den Ordner „wef“ legen</h3>
+                            <p class="text-base-content/80">Gibt es dort keinen Ordner <code>wef</code>, lege ihn an (klein geschrieben). Kopiere <code>citeolivia-word-addin.xml</code> hinein.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <span class="badge badge-primary badge-lg shrink-0 font-semibold">4</span>
+                        <div>
+                            <h3 class="font-semibold text-lg">Add-in in Word öffnen</h3>
+                            <p class="text-base-content/80">Word starten, ein Dokument öffnen → <strong>Start</strong> (oder <strong>Einfügen</strong>) → <strong>Add-Ins</strong> → <strong>Meine Add-Ins</strong> → <strong>CiteOlivia</strong>.</p>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+
+            <!-- Browser -->
+            <input type="radio" name="system" class="tab" aria-label="Word im Browser">
+            <div class="tab-content bg-base-100 border-base-300 p-6 lg:p-8">
+                <p class="text-base-content/80 max-w-prose">Am schnellsten: Word im Browser über Microsoft 365 braucht keine Ordner und keine Einstellungen.</p>
+                <ol class="mt-6 space-y-6">
+                    <li class="flex gap-4">
+                        <span class="badge badge-primary badge-lg shrink-0 font-semibold">1</span>
+                        <div>
+                            <h3 class="font-semibold text-lg">Dokument öffnen</h3>
+                            <p class="text-base-content/80">Auf <a class="link link-primary" href="https://www.office.com" target="_blank" rel="noopener">office.com</a> anmelden und ein Word-Dokument öffnen.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <span class="badge badge-primary badge-lg shrink-0 font-semibold">2</span>
+                        <div>
+                            <h3 class="font-semibold text-lg">Add-in hochladen</h3>
+                            <p class="text-base-content/80"><strong>Start</strong> → <strong>Add-Ins</strong> → <strong>Weitere Add-Ins</strong> → Reiter <strong>Meine Add-Ins</strong> → <strong>Mein Add-In hochladen</strong> → <code>citeolivia-word-addin.xml</code> auswählen → <strong>Hochladen</strong>.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <span class="badge badge-primary badge-lg shrink-0 font-semibold">3</span>
+                        <div>
+                            <h3 class="font-semibold text-lg">Fertig</h3>
+                            <p class="text-base-content/80">Auf der Registerkarte <strong>Start</strong> erscheint <strong>CiteOlivia</strong>. Nutze am besten <strong>Edge oder Chrome</strong>.</p>
+                        </div>
+                    </li>
+                </ol>
+                <p class="mt-6 text-sm text-base-content/60">Hochgeladene Add-ins merkt sich der Browser. Nach dem Löschen der Browserdaten oder in einem anderen Browser lädst du die Datei einfach erneut hoch.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- First steps -->
+    <section class="mt-16">
+        <h2 class="text-3xl">Erste Schritte</h2>
+        <div class="mt-6 grid md:grid-cols-3 gap-4">
+            <div class="card bg-base-100 border border-base-300">
+                <div class="card-body">
+                    <span class="badge badge-accent">1</span>
+                    <h3 class="card-title text-lg">Anmelden</h3>
+                    <p class="text-base-content/75">Auf <strong>CiteOlivia</strong> klicken und mit deinem CiteOlivia-Konto anmelden.</p>
+                </div>
+            </div>
+            <div class="card bg-base-100 border border-base-300">
+                <div class="card-body">
+                    <span class="badge badge-accent">2</span>
+                    <h3 class="card-title text-lg">Projekt wählen</h3>
+                    <p class="text-base-content/75">z. B. „Masterarbeit“. Das Dokument merkt sich das Projekt, beim nächsten Öffnen ist es schon eingestellt.</p>
+                </div>
+            </div>
+            <div class="card bg-base-100 border border-base-300">
+                <div class="card-body">
+                    <span class="badge badge-accent">3</span>
+                    <h3 class="card-title text-lg">Zitieren</h3>
+                    <p class="text-base-content/75">Titel suchen, optional die Seite eintragen, <strong>Zitieren</strong> klicken. Am Ende <strong>Literaturverzeichnis einfügen</strong>.</p>
+                </div>
+            </div>
+        </div>
+        <p class="mt-4 text-sm text-base-content/60">Zitate und Literaturverzeichnis sind in Word umrahmte Felder. Ändere den Text darin nicht von Hand, sondern in CiteOlivia, und klicke dann auf <strong>Alle Zitate aktualisieren</strong>.</p>
+    </section>
+
+    <!-- Help -->
+    <section id="hilfe" class="mt-16 scroll-mt-8">
+        <h2 class="text-3xl">Hilfe bei Problemen</h2>
+        <div class="mt-6 space-y-2">
+            <details class="collapse collapse-arrow bg-base-100 border border-base-300">
+                <summary class="collapse-title font-semibold">Word nimmt den Pfad bei „Katalog hinzufügen“ nicht an</summary>
+                <div class="collapse-content text-base-content/80">
+                    <p>Es muss der <strong>Netzwerkpfad</strong> sein (<code>\\Computername\Ordner</code>), nicht <code>C:\…</code>, und der Ordner muss freigegeben sein (Schritt 2). Den Computernamen findest du unter <strong>Einstellungen → System → Info → Gerätename</strong>.</p>
+                </div>
+            </details>
+            <details class="collapse collapse-arrow bg-base-100 border border-base-300">
+                <summary class="collapse-title font-semibold">Der Reiter „Freigegebener Ordner“ fehlt oder ist leer</summary>
+                <div class="collapse-content text-base-content/80">
+                    <p>Prüfe, ob das Häkchen <strong>Im Menü anzeigen</strong> gesetzt ist, ob die Datei im Ordner liegt und ob Word wirklich ganz geschlossen war. Im Fenster „Office-Add-Ins“ hilft oft ein Klick auf <strong>Aktualisieren</strong>.</p>
+                </div>
+            </details>
+            <details class="collapse collapse-arrow bg-base-100 border border-base-300">
+                <summary class="collapse-title font-semibold">Die Einstellungen sind ausgegraut (Firmen- oder Hochschul-PC)</summary>
+                <div class="collapse-content text-base-content/80">
+                    <p>Dann hat deine IT eigene Add-in-Kataloge gesperrt. Zwei Wege:</p>
+                    <ul class="list-disc ps-5 mt-2 space-y-1">
+                        <li>Nutze <strong>Word im Browser</strong>, siehe Reiter oben.</li>
+                        <li>Bitte deine IT, CiteOlivia zentral bereitzustellen: Microsoft-365-Admin-Center → <strong>Einstellungen</strong> → <strong>Integrierte Apps</strong> → <strong>Benutzerdefinierte Apps hochladen</strong> → die Add-in-Datei auswählen. Dann erscheint CiteOlivia bei allen automatisch.</li>
+                    </ul>
+                </div>
+            </details>
+            <details class="collapse collapse-arrow bg-base-100 border border-base-300">
+                <summary class="collapse-title font-semibold">Die Schaltfläche CiteOlivia ist nach einem Neustart verschwunden</summary>
+                <div class="collapse-content text-base-content/80">
+                    <p>Das passiert bei selbst installierten Add-ins gelegentlich. Füge es wie in Schritt 5 erneut hinzu. Deine Zitate im Dokument bleiben erhalten.</p>
+                </div>
+            </details>
+            <details class="collapse collapse-arrow bg-base-100 border border-base-300">
+                <summary class="collapse-title font-semibold">Die Seitenleiste bleibt leer oder zeigt etwas Altes</summary>
+                <div class="collapse-content text-base-content/80">
+                    <p>Word speichert Add-ins zwischen. Schließe Word und lösche den Zwischenspeicher:</p>
+                    <ul class="list-disc ps-5 mt-2 space-y-1">
+                        <li><strong>Windows:</strong> den Inhalt des Ordners <code class="break-all">%LOCALAPPDATA%\Microsoft\Office\16.0\Wef\</code> (Pfad in die Adresszeile des Explorers einfügen).</li>
+                        <li><strong>Mac:</strong> den Inhalt von <code class="break-all">~/Library/Containers/com.microsoft.Word/Data/Library/Caches/</code>.</li>
+                    </ul>
+                    <p class="mt-2">Danach Word neu starten.</p>
+                </div>
+            </details>
+            <details class="collapse collapse-arrow bg-base-100 border border-base-300">
+                <summary class="collapse-title font-semibold">In Word im Browser lande ich immer wieder bei der Anmeldung</summary>
+                <div class="collapse-content text-base-content/80">
+                    <p>Manche Browser blockieren Anmeldungen in eingebetteten Fenstern, z. B. Safari oder ein „strenger“ Tracking-Schutz. Nutze Edge oder Chrome mit Standardeinstellungen oder Word auf dem Desktop.</p>
+                </div>
+            </details>
+            <details class="collapse collapse-arrow bg-base-100 border border-base-300">
+                <summary class="collapse-title font-semibold">Wird mein Text an CiteOlivia übertragen?</summary>
+                <div class="collapse-content text-base-content/80">
+                    <p><strong>Nein.</strong> Das Add-in liest nur die eigenen Zitatfelder im Dokument aus und schickt CiteOlivia lediglich, welche Titel mit welcher Seite zitiert sind. Zurück kommt der fertig formatierte Zitattext. Dein Text bleibt in Word. Im Dokument selbst stehen nur Verweise auf deine Titel, keine Zugangsdaten.</p>
+                </div>
+            </details>
+            <details class="collapse collapse-arrow bg-base-100 border border-base-300">
+                <summary class="collapse-title font-semibold">Muss ich das Add-in aktualisieren?</summary>
+                <div class="collapse-content text-base-content/80">
+                    <p>Nein. Word lädt CiteOlivia bei jedem Öffnen neu, Verbesserungen sind also sofort da. Nur falls sich die Add-in-Datei selbst ändert, sagen wir dir Bescheid.</p>
+                </div>
+            </details>
+            <details class="collapse collapse-arrow bg-base-100 border border-base-300">
+                <summary class="collapse-title font-semibold">Wie entferne ich das Add-in wieder?</summary>
+                <div class="collapse-content text-base-content/80">
+                    <ul class="list-disc ps-5 space-y-1">
+                        <li><strong>Windows:</strong> Datei aus dem freigegebenen Ordner löschen, optional den Katalog im Trust Center entfernen, Word neu starten.</li>
+                        <li><strong>Mac:</strong> Datei aus dem Ordner <code>wef</code> löschen, Word neu starten.</li>
+                        <li><strong>Browser:</strong> <strong>Add-Ins</strong> → <strong>Weitere Add-Ins</strong> → <strong>Meine Add-Ins</strong> → beim Add-in <strong>…</strong> → <strong>Entfernen</strong>.</li>
+                    </ul>
+                    <p class="mt-2">Deine Dokumente bleiben lesbar, die Zitate sind normaler Text.</p>
+                </div>
+            </details>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="mt-16 rounded-box bg-accent p-8 lg:p-10 flex flex-col md:flex-row md:items-center gap-6 justify-between">
+        <div>
+            <h2 class="text-2xl">Bereit zum Schreiben?</h2>
+            <p class="mt-1 text-base-content/80">Lade das Add-in herunter und zitiere direkt aus deinem Projekt.</p>
+        </div>
+        <div class="flex flex-wrap gap-3">
+            <a class="btn btn-primary" th:href="@{/word/manifest.xml}" download>Add-in herunterladen</a>
+            <a sec:authorize="isAnonymous()" class="btn btn-outline" th:href="@{/register}">Kostenlos registrieren</a>
+            <a sec:authorize="isAuthenticated()" class="btn btn-outline" th:href="@{/dashboard}">Zu meinen Projekten</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

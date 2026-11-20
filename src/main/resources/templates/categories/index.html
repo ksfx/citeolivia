@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(${project.name}, ~{::main})}">
+<body>
+<main class="flex-1 w-full max-w-6xl mx-auto px-4 lg:px-8 py-8">
+    <div th:replace="~{fragments/project :: projectHeader('categories')}"></div>
+
+    <p class="text-base-content/70 mb-4 max-w-3xl">Die Gliederung entspricht den Kapiteln deiner Arbeit. Ordne Titel und Wissenselemente
+        den Kategorien zu – im Wissensorganisator siehst du dann pro Kapitel, was du schon gesammelt hast.</p>
+
+    <div class="card bg-base-100 border border-base-300">
+        <ul class="divide-y divide-base-300">
+            <li th:each="c : ${outline}" class="flex flex-wrap items-center gap-2 px-4 py-2"
+                th:style="|padding-left: ${1 + c.depth * 1.5}rem|">
+                <span class="flex-1 min-w-40" th:classappend="${c.depth == 0} ? 'font-semibold'">
+                    <span class="font-mono text-base-content/60 mr-1" th:text="${c.number}">1</span>
+                    <span th:text="${c.name}">Einleitung</span>
+                </span>
+                <form th:action="@{/projects/{p}/categories/{c}/move(p=${project.id},c=${c.id})}" method="post" class="inline">
+                    <input type="hidden" name="direction" value="-1">
+                    <button class="btn btn-ghost btn-xs" th:disabled="${c.first}" aria-label="Nach oben" title="Nach oben">↑</button>
+                </form>
+                <form th:action="@{/projects/{p}/categories/{c}/move(p=${project.id},c=${c.id})}" method="post" class="inline">
+                    <input type="hidden" name="direction" value="1">
+                    <button class="btn btn-ghost btn-xs" th:disabled="${c.last}" aria-label="Nach unten" title="Nach unten">↓</button>
+                </form>
+                <details class="dropdown dropdown-end">
+                    <summary class="btn btn-ghost btn-xs">Umbenennen</summary>
+                    <form class="dropdown-content z-10 card bg-base-100 border border-base-300 p-3 w-72 flex gap-2"
+                          th:action="@{/projects/{p}/categories/{c}/rename(p=${project.id},c=${c.id})}" method="post">
+                        <input class="input input-sm flex-1" name="name" th:value="${c.name}" required maxlength="200" aria-label="Neuer Name">
+                        <button class="btn btn-primary btn-sm">OK</button>
+                    </form>
+                </details>
+                <details class="dropdown dropdown-end">
+                    <summary class="btn btn-ghost btn-xs">+ Unterkategorie</summary>
+                    <form class="dropdown-content z-10 card bg-base-100 border border-base-300 p-3 w-72 flex gap-2"
+                          th:action="@{/projects/{p}/categories(p=${project.id})}" method="post">
+                        <input type="hidden" name="parentId" th:value="${c.id}">
+                        <input class="input input-sm flex-1" name="name" required maxlength="200" placeholder="Name" aria-label="Name der Unterkategorie">
+                        <button class="btn btn-primary btn-sm">OK</button>
+                    </form>
+                </details>
+                <button class="btn btn-ghost btn-xs text-error"
+                        th:hx-post="@{/projects/{p}/categories/{c}/delete(p=${project.id},c=${c.id})}"
+                        th:hx-confirm="|Kategorie „${c.label()}“ samt Unterkategorien löschen? Titel und Wissenselemente bleiben erhalten, nur die Zuordnung entfällt.|">Löschen</button>
+            </li>
+            <li th:if="${#lists.isEmpty(outline)}" class="px-4 py-6 text-base-content/60">Noch keine Kategorien angelegt.</li>
+        </ul>
+        <form class="flex flex-wrap gap-2 p-4 border-t border-base-300" th:action="@{/projects/{p}/categories(p=${project.id})}" method="post">
+            <input class="input flex-1 min-w-60" name="name" required maxlength="200" placeholder="Neues Kapitel, z. B. Forschungsstand" aria-label="Name der Kategorie">
+            <button class="btn btn-primary">Kategorie hinzufügen</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

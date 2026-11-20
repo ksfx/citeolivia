@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Knowledge item card. Expects ${k} (KnowledgeView), ${project}, optional ${showSource}. -->
+<article th:fragment="card" class="card bg-base-100 border border-base-300" th:id="|k-${k.item.id}|">
+    <div class="card-body p-4 gap-2">
+        <div class="flex items-start gap-2 flex-wrap">
+            <span class="badge badge-sm"
+                  th:classappend="${k.item.type.name() == 'QUOTE'} ? 'badge-primary' : (${k.item.type.name() == 'THOUGHT'} ? 'badge-secondary' : 'badge-accent')"
+                  th:text="${k.item.type.label}">Zitat</span>
+            <strong class="flex-1 min-w-40" th:text="${k.item.coreStatement}">Kernaussage</strong>
+            <span class="flex gap-1 ml-auto">
+                <button class="btn btn-ghost btn-xs" type="button"
+                        th:hx-get="@{/projects/{p}/knowledge/{k}/edit(p=${project.id},k=${k.item.id},source=${showSource == true})}"
+                        hx-target="closest article" hx-swap="outerHTML">Bearbeiten</button>
+                <button class="btn btn-ghost btn-xs text-error" type="button"
+                        th:hx-post="@{/projects/{p}/knowledge/{k}/delete(p=${project.id},k=${k.item.id})}"
+                        hx-confirm="Dieses Wissenselement löschen?" hx-target="closest article" hx-swap="outerHTML">Löschen</button>
+            </span>
+        </div>
+        <blockquote th:if="${k.item.type.name() == 'QUOTE'}" class="border-l-4 border-primary pl-3 whitespace-pre-line"
+                    th:text="|„${k.item.text}“|">„Zitat“</blockquote>
+        <p th:unless="${k.item.type.name() == 'QUOTE'}" class="whitespace-pre-line" th:text="${k.item.text}">Text</p>
+        <div class="flex flex-wrap items-center gap-2 text-sm text-base-content/70">
+            <span th:if="${k.citation}" class="font-mono" th:text="${k.citation}">(Müller, 2020, S. 12)</span>
+            <span th:if="${k.citation == null and k.item.pageRange != null}" th:text="|S. ${k.item.pageRange}|">S. 12</span>
+            <a th:if="${showSource == true and k.reference != null}" class="link link-primary"
+               th:href="@{/projects/{p}/references/{r}(p=${project.id},r=${k.reference.id})}" th:text="${k.source}">Müller 2020</a>
+            <span th:each="c : ${k.categories}" class="badge badge-ghost badge-sm" th:text="${c.label()}">1 Einleitung</span>
+        </div>
+    </div>
+</article>
+
+<!-- Fields of a knowledge item form (inside a form with th:object). -->
+<th:block th:fragment="fields(withSource)">
+    <div class="grid sm:grid-cols-3 gap-x-4">
+        <fieldset class="fieldset" th:if="${withSource}">
+            <legend class="fieldset-legend">Art</legend>
+            <select class="select w-full" th:field="*{type}">
+                <option th:each="t : ${knowledgeTypes}" th:if="${t.name() != 'THOUGHT'}" th:value="${t}" th:text="${t.label}">Zitat</option>
+            </select>
+        </fieldset>
+        <input th:unless="${withSource}" type="hidden" th:field="*{type}">
+        <fieldset class="fieldset" th:classappend="${withSource} ? 'sm:col-span-1' : 'sm:col-span-3'">
+            <legend class="fieldset-legend">Kernaussage (optional)</legend>
+            <input class="input w-full" type="text" th:field="*{coreStatement}" placeholder="Worum geht es in einem Satz?">
+        </fieldset>
+        <fieldset class="fieldset" th:if="${withSource}">
+            <legend class="fieldset-legend">Seite(n)</legend>
+            <input class="input w-full" type="text" th:field="*{pageRange}" placeholder="z. B. 12 oder 12-14"
+                   th:classappend="${#fields.hasErrors('pageRange')} ? 'input-error'">
+        </fieldset>
+    </div>
+    <fieldset class="fieldset">
+        <legend class="fieldset-legend">Text</legend>
+        <textarea class="textarea w-full" rows="4" th:field="*{text}"
+                  th:classappend="${#fields.hasErrors('text')} ? 'textarea-error'"
+                  th:placeholder="${withSource} ? 'Zitat, Paraphrase, Zusammenfassung oder Kommentar …' : 'Dein Gedanke …'"></textarea>
+        <p class="text-sm text-error" th:if="${#fields.hasErrors('text')}" th:errors="*{text}"></p>
+    </fieldset>
+    <div th:replace="~{fragments/forms :: categories}"></div>
+</th:block>
+
+<!-- Inline edit form replacing a card. Expects ${k}, ${editForm}, ${outline}, ${showSource}. -->
+<article th:fragment="edit" class="card bg-base-100 border border-primary" th:id="|k-${k.item.id}|">
+    <form class="card-body p-4 gap-0" th:object="${editForm}"
+          th:hx-post="@{/projects/{p}/knowledge/{k}(p=${project.id},k=${k.item.id},source=${showSource == true})}"
+          hx-target="closest article" hx-swap="outerHTML">
+        <th:block th:replace="~{knowledge/card :: fields(${k.reference != null})}"></th:block>
+        <div class="flex gap-2 mt-3">
+            <button type="submit" class="btn btn-primary btn-sm">Speichern</button>
+            <button type="button" class="btn btn-ghost btn-sm"
+                    th:hx-get="@{/projects/{p}/knowledge/{k}(p=${project.id},k=${k.item.id},source=${showSource == true})}"
+                    hx-target="closest article" hx-swap="outerHTML">Abbrechen</button>
+        </div>
+    </form>
+</article>
+</body>
+</html>

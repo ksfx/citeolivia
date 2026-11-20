@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Text input bound to a property of the current th:object. -->
+<fieldset th:fragment="textField(path, label)" class="fieldset">
+    <legend class="fieldset-legend" th:text="${label}">Feld</legend>
+    <input class="input w-full" type="text" th:field="*{__${path}__}"
+           th:classappend="${#fields.hasErrors(path)} ? 'input-error'">
+    <p class="text-sm text-error" th:if="${#fields.hasErrors(path)}" th:errors="*{__${path}__}"></p>
+</fieldset>
+
+<!-- Category checkboxes for *{categoryIds}. Expects ${outline}. -->
+<fieldset th:fragment="categories" class="fieldset" th:if="${outline != null and !#lists.isEmpty(outline)}">
+    <legend class="fieldset-legend">Kategorien (Gliederung)</legend>
+    <div class="max-h-56 overflow-y-auto border border-base-300 rounded-field p-2 grid gap-1">
+        <label th:each="c : ${outline}" class="flex items-center gap-2 cursor-pointer text-sm"
+               th:style="|padding-left: ${c.depth * 1.25}rem|">
+            <input type="checkbox" class="checkbox checkbox-sm checkbox-primary" th:field="*{categoryIds}" th:value="${c.id}">
+            <span th:text="${c.label()}">1 Einleitung</span>
+        </label>
+    </div>
+</fieldset>
+</body>
+</html>

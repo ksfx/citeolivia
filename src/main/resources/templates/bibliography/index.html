@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(${project.name}, ~{::main})}">
+<body>
+<main class="flex-1 w-full max-w-6xl mx-auto px-4 lg:px-8 py-8">
+    <div th:replace="~{fragments/project :: projectHeader('bibliography')}"></div>
+
+    <div class="grid lg:grid-cols-3 gap-6">
+        <section class="lg:col-span-2 card bg-base-100 border border-base-300">
+            <div class="card-body">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <h2 class="card-title">Literaturverzeichnis</h2>
+                    <label class="flex items-center gap-2 text-sm">Zitierstil
+                        <select name="style" class="select select-sm w-auto"
+                                th:hx-post="@{/projects/{id}/citation-style(id=${project.id})}"
+                                hx-trigger="change" hx-target="#bibliography" hx-swap="outerHTML">
+                            <option th:each="s : ${citationStyles}" th:value="${s}" th:text="${s.label}"
+                                    th:selected="${s == project.citationStyle}">APA</option>
+                        </select>
+                    </label>
+                </div>
+                <div id="bibliography" th:fragment="list">
+                    <!-- after a style change via htmx: also update the badge in the project header -->
+                    <span th:if="${styleChanged}" id="style-badge" hx-swap-oob="true" class="badge badge-accent"
+                          title="Zitierstil des Projekts" th:text="${project.citationStyle.label}">APA 7</span>
+                    <p th:if="${#lists.isEmpty(entries)}" class="text-base-content/60 py-6">Noch keine Titel im Projekt.</p>
+                    <div th:unless="${#lists.isEmpty(entries)}">
+                        <p class="text-sm text-base-content/60 mb-3">Tipp: Liste markieren und in Word einfügen – die Kursivschrift bleibt erhalten.</p>
+                        <div class="flex flex-col gap-3 leading-relaxed">
+                            <p th:each="e : ${entries}" class="pl-8 -indent-8" th:utext="${e.citationHtml}">Müller, A. (2020). <i>Titel</i>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="flex flex-col gap-6">
+            <section class="card bg-base-100 border border-base-300">
+                <div class="card-body">
+                    <h2 class="card-title">Export</h2>
+                    <a class="btn btn-outline justify-start" th:href="@{/projects/{id}/export.bib(id=${project.id})}">BibTeX (.bib) – für LaTeX</a>
+                    <a class="btn btn-outline justify-start" th:href="@{/projects/{id}/export.ris(id=${project.id})}">RIS (.ris) – für Word, Zotero, Citavi</a>
+                    <a class="btn btn-outline justify-start" th:href="@{/projects/{id}/export.txt(id=${project.id})}">Text (.txt) – formatiertes Verzeichnis</a>
+                    <a class="btn btn-outline justify-start" th:href="@{/projects/{id}/knowledge/export.md(id=${project.id})}">Wissen (.md) – nach Gliederung</a>
+                </div>
+            </section>
+
+            <section id="import" class="card bg-base-100 border border-base-300">
+                <form class="card-body" th:action="@{/projects/{id}/import(id=${project.id})}" method="post" enctype="multipart/form-data">
+                    <h2 class="card-title">BibTeX importieren</h2>
+                    <p class="text-sm text-base-content/70">Aus Zotero, Google Scholar, Citavi, Mendeley usw. Einträge mit bereits vorhandener DOI/ISBN werden übersprungen.</p>
+                    <div th:if="${importError}" role="alert" class="alert alert-error py-2" th:text="${importError}"></div>
+                    <div th:if="${importResult}" role="alert" class="alert py-2"
+                         th:classappend="${importResult.imported > 0} ? 'alert-success' : 'alert-warning'">
+                        <div>
+                            <p th:text="|${importResult.imported} Titel importiert.|">3 Titel importiert.</p>
+                            <ul th:if="${!#lists.isEmpty(importResult.skipped)}" class="list-disc pl-5 text-sm">
+                                <li th:each="s : ${importResult.skipped}" th:text="${s}"></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <input type="file" name="file" accept=".bib,.bibtex,.txt,text/plain" class="file-input w-full" aria-label="BibTeX-Datei">
+                    <textarea name="text" class="textarea w-full font-mono text-xs" rows="4" placeholder="… oder BibTeX hier einfügen"></textarea>
+                    <button type="submit" class="btn btn-primary">Importieren</button>
+                </form>
+            </section>
+        </div>
+    </div>
+</main>
+</body>
+</html>
