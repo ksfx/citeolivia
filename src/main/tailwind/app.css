@@ -160,3 +160,14 @@ video::cue {
   color: #FFFFFF;
   background-color: rgba(28, 24, 48, 0.85);
 }
+
+/* Play button of the product video: soft pulsing ring (off with reduced motion) */
+@keyframes co-play-pulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  70% { transform: scale(1.55); opacity: 0; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+.co-play-ring { animation: co-play-pulse 2.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .co-play-ring { animation: none; opacity: 0; }
+}

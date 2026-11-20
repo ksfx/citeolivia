@@ -21,19 +21,36 @@
                 <a sec:authorize="isAuthenticated()" class="btn btn-primary btn-lg" th:href="@{/dashboard}">Zur Bibliothek</a>
             </div>
         </div>
-        <!-- Product video (Wiki: Marketingvideo). Native player, no custom JS: playback starts via the control bar. -->
-        <figure class="relative w-full max-w-xl mx-auto">
+        <!-- Product video (Wiki: Marketingvideo). Big play button via /js/video-player.js (approved custom JS);
+             without JS the native player with controls remains. -->
+        <figure class="relative w-full max-w-xl mx-auto" data-video-player>
             <span class="absolute -inset-5 rounded-[2.5rem] bg-gradient-to-br from-primary/35 via-accent to-primary/15 blur-2xl opacity-80 dark:opacity-50"
                   aria-hidden="true"></span>
-            <video class="relative block w-full aspect-video rounded-box border border-base-300 ring-1 ring-primary/10 bg-neutral"
-                   controls preload="none" playsinline
-                   th:poster="@{/video/citeolivia-marketing-poster-v2.jpg}"
-                   aria-label="Produktvideo: So arbeitest du mit CiteOlivia (3 Minuten 14 Sekunden)">
-                <source th:src="@{/video/citeolivia-marketing.mp4}" type="video/mp4">
-                <track kind="captions" srclang="de" label="Deutsch" th:src="@{/video/citeolivia-marketing.de.vtt}">
-                <p class="p-6">Dein Browser kann das Video nicht abspielen.
-                    <a class="link link-primary" th:href="@{/video/citeolivia-marketing.mp4}">Video herunterladen (MP4, 12 MB)</a></p>
-            </video>
+            <div class="relative">
+                <video class="block w-full aspect-video rounded-box border border-base-300 ring-1 ring-primary/10 bg-neutral"
+                       controls preload="none" playsinline
+                       th:poster="@{/video/citeolivia-marketing-poster-v3.jpg}"
+                       aria-label="Produktvideo: So arbeitest du mit CiteOlivia (3 Minuten 14 Sekunden)">
+                    <source th:src="@{/video/citeolivia-marketing.mp4}" type="video/mp4">
+                    <track kind="captions" srclang="de" label="Deutsch" th:src="@{/video/citeolivia-marketing.de.vtt}">
+                    <p class="p-6">Dein Browser kann das Video nicht abspielen.
+                        <a class="link link-primary" th:href="@{/video/citeolivia-marketing.mp4}">Video herunterladen (MP4, 12 MB)</a></p>
+                </video>
+                <button type="button" data-video-play hidden
+                        class="group/play absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 rounded-box cursor-pointer focus-visible:outline-none"
+                        aria-label="Video abspielen: CiteOlivia in 3 Minuten">
+                    <span class="relative grid place-items-center size-20 lg:size-24">
+                        <span class="co-play-ring absolute inset-0 rounded-full bg-brand-violet/45" aria-hidden="true"></span>
+                        <span class="relative grid place-items-center size-full rounded-full bg-brand-violet text-white ring-8 ring-brand-violet/25 shadow-xl shadow-brand-violet/30 transition-transform duration-300 ease-out group-hover/play:scale-110 group-focus-visible/play:ring-white">
+                            <svg viewBox="0 0 24 24" class="size-9 lg:size-11 translate-x-0.5" fill="currentColor" aria-hidden="true">
+                                <path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11.24-6.86a1 1 0 0 0 0-1.72L9.5 4.28A1 1 0 0 0 8 5.14z"/>
+                            </svg>
+                        </span>
+                    </span>
+                    <span data-video-play-label
+                          class="rounded-full bg-brand-ink/75 text-white backdrop-blur px-4 py-1.5 text-sm font-semibold transition-colors group-hover/play:bg-brand-ink/90">Video ansehen · 3:14</span>
+                </button>
+            </div>
             <figcaption class="relative mt-4 text-center text-sm text-base-content/70">
                 CiteOlivia in 3 Minuten · mit deutschen Untertiteln
             </figcaption>
@@ -71,6 +88,7 @@
         </div>
         <a class="btn btn-primary" th:href="@{/word-add-in}">So installierst du das Add-in</a>
     </section>
+    <script th:src="@{/js/video-player.js}" defer></script>
 </main>
 </body>
 </html>
