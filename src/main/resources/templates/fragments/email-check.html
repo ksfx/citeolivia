@@ -1,8 +1,0 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<body>
-<p th:fragment="hint" id="email-hint" class="text-sm"
-   th:classappend="${blank} ? '' : (${available} ? 'text-success' : 'text-error')"
-   th:text="${blank} ? '' : (${available} ? 'E-Mail ist noch frei' : 'Diese E-Mail ist bereits registriert')"></p>
-</body>
-</html>

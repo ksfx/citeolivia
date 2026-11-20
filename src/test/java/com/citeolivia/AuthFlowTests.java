@@ -113,18 +113,51 @@ class AuthFlowTests {
     }
 
     @Test
-    void duplicateEmailIsRejected() throws Exception {
-        register("dup@example.com", "Dup", PASSWORD);
+    void registrationDoesNotRevealExistingAccounts() throws Exception {
+        register("dup@example.com", "Original", PASSWORD);
 
-        mvc.perform(post("/register")
+        // Registering an existing address (other case, other password) looks exactly like a new registration ...
+        MvcResult existing = mvc.perform(post("/register")
                         .with(csrf())
                         .param("email", "DUP@example.com")
-                        .param("displayName", "Dup 2")
+                        .param("displayName", "Angreifer")
+                        .param("password", "attacker-password-1")
+                        .param("passwordConfirm", "attacker-password-1"))
+                .andReturn();
+        MvcResult fresh = mvc.perform(post("/register")
+                        .with(csrf())
+                        .param("email", "new@example.com")
+                        .param("displayName", "Neu")
                         .param("password", PASSWORD)
                         .param("passwordConfirm", PASSWORD))
-                .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("bereits registriert")));
-        assertThat(userCount()).isEqualTo(1);
+                .andReturn();
+        assertThat(existing.getResponse().getStatus())
+                .isEqualTo(fresh.getResponse().getStatus());
+        assertThat(existing.getResponse().getRedirectedUrl())
+                .isEqualTo(fresh.getResponse().getRedirectedUrl())
+                .isEqualTo("/login?registered=");
+        assertThat(existing.getResponse().getContentAsString())
+                .isEqualTo(fresh.getResponse().getContentAsString());
+
+        // ... but changes nothing: no second account, original name and password stay valid
+        assertThat(jdbc.sql("SELECT count(*) FROM app_user WHERE email = 'dup@example.com'")
+                        .query(Long.class)
+                        .single())
+                .isEqualTo(1);
+        assertThat(jdbc.sql("SELECT display_name FROM app_user WHERE email = 'dup@example.com'")
+                        .query(String.class)
+                        .single())
+                .isEqualTo("Original");
+        mvc.perform(formLogin("/login")
+                        .userParameter("email")
+                        .user("dup@example.com")
+                        .password(PASSWORD))
+                .andExpect(redirectedUrl("/dashboard"));
+        mvc.perform(formLogin("/login")
+                        .userParameter("email")
+                        .user("dup@example.com")
+                        .password("attacker-password-1"))
+                .andExpect(redirectedUrl("/login?error"));
     }
 
     @Test
@@ -194,15 +227,15 @@ class AuthFlowTests {
     }
 
     @Test
-    void emailCheckReturnsHtmlFragment() throws Exception {
+    void thereIsNoPublicEmailAvailabilityCheck() throws Exception {
         register("taken@example.com", "Taken", PASSWORD);
 
         mvc.perform(get("/register/email-check").param("email", "taken@example.com"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("bereits registriert")))
-                .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("<html"))));
-        mvc.perform(get("/register/email-check").param("email", "free@example.com"))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("noch frei")));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login"));
+        mvc.perform(get("/register"))
+                .andExpect(content()
+                        .string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("email-check"))));
     }
 
     @Test

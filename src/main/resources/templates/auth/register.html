@@ -13,12 +13,9 @@
             <label class="floating-label">
                 <span>E-Mail</span>
                 <input class="input w-full" type="email" th:field="*{email}" placeholder="E-Mail" autocomplete="email"
-                       th:classappend="${#fields.hasErrors('email')} ? 'input-error'"
-                       th:hx-get="@{/register/email-check}" hx-trigger="input changed delay:400ms"
-                       hx-target="#email-hint" hx-swap="outerHTML" required>
+                       th:classappend="${#fields.hasErrors('email')} ? 'input-error'" required>
             </label>
-            <p id="email-hint" class="text-sm text-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
-            <p id="email-hint" class="text-sm" th:unless="${#fields.hasErrors('email')}"></p>
+            <p class="text-sm text-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
 
             <label class="floating-label">
                 <span>Name</span>

@@ -3,6 +3,9 @@ package com.citeolivia.user;
 import com.citeolivia.security.PasswordHasher;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -10,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
+
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository users;
     private final RoleRepository roles;
@@ -25,33 +30,37 @@ public class UserService {
         return email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
     }
 
-    @Transactional(readOnly = true)
-    public boolean isEmailAvailable(String email) {
-        return !users.existsByEmail(normalizeEmail(email));
-    }
-
     /**
      * Registers a new user with role USER. Bootstrap rule: the very first user also gets ADMIN, so a
      * fresh installation has an administrator without seeding credentials.
+     *
+     * <p>Must not reveal whether an address is already registered (user enumeration): for an existing
+     * address nothing is created or changed, the caller cannot tell the difference, and the password is
+     * hashed in both cases so that the response time is the same.
+     *
+     * @return the id of the new user, or empty if the address was already registered
      */
     @Transactional
-    public long register(RegistrationCommand command) {
+    public Optional<Long> register(RegistrationCommand command) {
         String email = normalizeEmail(command.email());
+        String passwordHash = passwordHasher.hash(command.rawPassword()); // always – constant timing
         if (users.existsByEmail(email)) {
-            throw new EmailAlreadyRegisteredException(email);
+            log.info("Registration for an already registered address ignored");
+            return Optional.empty();
         }
         boolean firstUser = users.count() == 0;
 
-        AppUser user =
-                AppUser.register(email, command.displayName().trim(), passwordHasher.hash(command.rawPassword()));
+        AppUser user = AppUser.register(email, command.displayName().trim(), passwordHash);
         user.grant(role(Role.USER));
         if (firstUser) {
             user.grant(role(Role.ADMIN));
         }
         try {
-            return users.save(user).getId();
+            return Optional.of(users.save(user).getId());
         } catch (DuplicateKeyException e) {
-            throw new EmailAlreadyRegisteredException(email);
+            // registered concurrently – same silent outcome
+            log.info("Registration for an already registered address ignored");
+            return Optional.empty();
         }
     }
 

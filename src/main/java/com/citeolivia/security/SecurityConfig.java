@@ -100,7 +100,6 @@ class SecurityConfig {
                                 "/",
                                 "/login",
                                 "/register",
-                                "/register/**",
                                 "/word-add-in",
                                 "/css/**",
                                 "/js/**",
