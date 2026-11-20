@@ -212,7 +212,7 @@ class AuthFlowTests {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("/video/citeolivia-marketing.mp4")))
                 .andExpect(
                         content().string(org.hamcrest.Matchers.containsString("/video/citeolivia-marketing.de.vtt")));
-        mvc.perform(get("/video/citeolivia-marketing-poster.jpg")).andExpect(status().isOk());
+        mvc.perform(get("/video/citeolivia-marketing-poster-v2.jpg")).andExpect(status().isOk());
         mvc.perform(get("/video/citeolivia-marketing.de.vtt"))
                 .andExpect(status().isOk())
                 // Content-Type text/vtt is set by Tomcat (server.mime-mappings), not visible in MockMvc
