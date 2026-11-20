@@ -32,16 +32,25 @@ class AuthController {
     }
 
     /**
-     * Same response for new and already registered addresses (no user enumeration): always back to the
-     * login page with a neutral message. Only input errors (format, password rules) are shown.
+     * On submit, an already registered address is reported (decision of the user, 2026-11-20). There is
+     * deliberately no live availability check while typing – that would allow cheap mass enumeration.
      */
     @PostMapping("/register")
     String register(
-            @Valid @ModelAttribute("form") RegistrationForm form, BindingResult binding, RedirectAttributes redirect) {
+            @Valid @ModelAttribute("form") RegistrationForm form,
+            BindingResult binding,
+            Model model,
+            RedirectAttributes redirect) {
         if (binding.hasErrors()) {
             return "auth/register";
         }
-        userService.register(new RegistrationCommand(form.email(), form.displayName(), form.password()));
+        if (userService
+                .register(new RegistrationCommand(form.email(), form.displayName(), form.password()))
+                .isEmpty()) {
+            binding.rejectValue("email", "duplicate", "Diese E-Mail-Adresse ist bereits registriert.");
+            model.addAttribute("emailTaken", true);
+            return "auth/register";
+        }
         redirect.addAttribute("registered", "");
         return "redirect:/login";
     }

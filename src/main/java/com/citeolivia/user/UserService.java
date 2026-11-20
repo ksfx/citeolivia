@@ -34,9 +34,8 @@ public class UserService {
      * Registers a new user with role USER. Bootstrap rule: the very first user also gets ADMIN, so a
      * fresh installation has an administrator without seeding credentials.
      *
-     * <p>Must not reveal whether an address is already registered (user enumeration): for an existing
-     * address nothing is created or changed, the caller cannot tell the difference, and the password is
-     * hashed in both cases so that the response time is the same.
+     * <p>For an already registered address nothing is created or changed. The password is hashed in
+     * both cases, so the response time does not differ.
      *
      * @return the id of the new user, or empty if the address was already registered
      */

@@ -6,7 +6,7 @@
     <div class="card w-full max-w-md bg-base-100 border border-base-300">
         <form class="card-body" th:action="@{/login}" method="post">
             <div th:replace="~{fragments/auth-card :: brand('Willkommen zurück')}"></div>
-            <div th:if="${param.registered}" role="alert" class="alert alert-success">Registrierung abgeschlossen – du kannst dich jetzt anmelden. Falls du schon ein Konto hattest, gilt dein bisheriges Passwort.</div>
+            <div th:if="${param.registered}" role="alert" class="alert alert-success">Registrierung erfolgreich – bitte anmelden.</div>
             <div th:if="${param.error}" role="alert" class="alert alert-error">E-Mail oder Passwort falsch.</div>
             <div th:if="${param.logout}" role="alert" class="alert alert-info">Du wurdest abgemeldet.</div>
             <label class="floating-label">

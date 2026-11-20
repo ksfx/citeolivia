@@ -113,33 +113,21 @@ class AuthFlowTests {
     }
 
     @Test
-    void registrationDoesNotRevealExistingAccounts() throws Exception {
+    void registeringAnExistingAddressShowsAMessageAndChangesNothing() throws Exception {
         register("dup@example.com", "Original", PASSWORD);
 
-        // Registering an existing address (other case, other password) looks exactly like a new registration ...
-        MvcResult existing = mvc.perform(post("/register")
+        mvc.perform(post("/register")
                         .with(csrf())
                         .param("email", "DUP@example.com")
-                        .param("displayName", "Angreifer")
-                        .param("password", "attacker-password-1")
-                        .param("passwordConfirm", "attacker-password-1"))
-                .andReturn();
-        MvcResult fresh = mvc.perform(post("/register")
-                        .with(csrf())
-                        .param("email", "new@example.com")
-                        .param("displayName", "Neu")
-                        .param("password", PASSWORD)
-                        .param("passwordConfirm", PASSWORD))
-                .andReturn();
-        assertThat(existing.getResponse().getStatus())
-                .isEqualTo(fresh.getResponse().getStatus());
-        assertThat(existing.getResponse().getRedirectedUrl())
-                .isEqualTo(fresh.getResponse().getRedirectedUrl())
-                .isEqualTo("/login?registered=");
-        assertThat(existing.getResponse().getContentAsString())
-                .isEqualTo(fresh.getResponse().getContentAsString());
+                        .param("displayName", "Zweiter Versuch")
+                        .param("password", "other-password-123")
+                        .param("passwordConfirm", "other-password-123"))
+                .andExpect(status().isOk())
+                .andExpect(content()
+                        .string(org.hamcrest.Matchers.containsString("Diese E-Mail-Adresse ist bereits registriert.")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Zum Login")));
 
-        // ... but changes nothing: no second account, original name and password stay valid
+        // nothing created or changed: one account, original name and password
         assertThat(jdbc.sql("SELECT count(*) FROM app_user WHERE email = 'dup@example.com'")
                         .query(Long.class)
                         .single())
@@ -153,11 +141,6 @@ class AuthFlowTests {
                         .user("dup@example.com")
                         .password(PASSWORD))
                 .andExpect(redirectedUrl("/dashboard"));
-        mvc.perform(formLogin("/login")
-                        .userParameter("email")
-                        .user("dup@example.com")
-                        .password("attacker-password-1"))
-                .andExpect(redirectedUrl("/login?error"));
     }
 
     @Test

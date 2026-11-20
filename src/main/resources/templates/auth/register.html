@@ -15,7 +15,10 @@
                 <input class="input w-full" type="email" th:field="*{email}" placeholder="E-Mail" autocomplete="email"
                        th:classappend="${#fields.hasErrors('email')} ? 'input-error'" required>
             </label>
-            <p class="text-sm text-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+            <p class="text-sm text-error" th:if="${#fields.hasErrors('email')}">
+                <span th:errors="*{email}">Fehler</span>
+                <a th:if="${emailTaken}" class="link link-primary font-semibold" th:href="@{/login}">Zum Login</a>
+            </p>
 
             <label class="floating-label">
                 <span>Name</span>
