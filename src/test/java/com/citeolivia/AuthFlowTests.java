@@ -225,16 +225,16 @@ class AuthFlowTests {
     void marketingVideoIsPublicAndSeekable() throws Exception {
         mvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("/video/citeolivia-marketing.mp4")))
-                .andExpect(
-                        content().string(org.hamcrest.Matchers.containsString("/video/citeolivia-marketing.de.vtt")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("/video/citeolivia-marketing-v2.mp4")))
+                .andExpect(content()
+                        .string(org.hamcrest.Matchers.containsString("/video/citeolivia-marketing-v2.de.vtt")));
         mvc.perform(get("/video/citeolivia-marketing-poster-v3.jpg")).andExpect(status().isOk());
-        mvc.perform(get("/video/citeolivia-marketing.de.vtt"))
+        mvc.perform(get("/video/citeolivia-marketing-v2.de.vtt"))
                 .andExpect(status().isOk())
                 // Content-Type text/vtt is set by Tomcat (server.mime-mappings), not visible in MockMvc
                 .andExpect(content().string(org.hamcrest.Matchers.startsWith("WEBVTT")));
         // byte ranges are required for seeking in the browser player
-        mvc.perform(get("/video/citeolivia-marketing.mp4").header("Range", "bytes=0-1023"))
+        mvc.perform(get("/video/citeolivia-marketing-v2.mp4").header("Range", "bytes=0-1023"))
                 .andExpect(status().isPartialContent())
                 .andExpect(header().string("Content-Type", "video/mp4"))
                 .andExpect(header().string("Content-Length", "1024"))

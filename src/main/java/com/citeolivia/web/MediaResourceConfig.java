@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Marketing video, poster and subtitles under /video/** may be cached by browsers (the video is 12 MB).
+ * Marketing video, poster and subtitles under /video/** may be cached by browsers (the video is 13 MB).
  * Files there must get a new name when their content changes. Byte ranges for seeking are supported by
  * Spring's resource handler. The text/vtt type for subtitles comes from server.mime-mappings.
  */
